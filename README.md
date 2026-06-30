@@ -6,9 +6,9 @@ A library management system built with Spring Boot 3 (Java) and Angular 17 (Type
 
 ## Stack
 
-- **Backend:** Spring Boot 3, Spring Security, JWT, JPA/Hibernate, H2 (in-memory)
-- **Frontend:** Angular 17, standalone components, RxJS
-- **Tests:** Cucumber-JVM + RestAssured (backend), Jasmine/Karma (frontend)
+- **Backend:** Spring Boot 3, Spring Security, JWT, JPA/Hibernate, H2 (in-memory) — 391 Java source files across 21 packages
+- **Frontend:** Angular 17, standalone components, RxJS — 143 TypeScript files
+- **Tests:** Cucumber-JVM + RestAssured (11 feature files, 33 Java step/support files), Jasmine/Karma (frontend)
 
 ## Users (seeded on startup)
 
