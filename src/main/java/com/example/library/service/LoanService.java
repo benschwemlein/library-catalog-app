@@ -1,6 +1,7 @@
 package com.example.library.service;
 
 import com.example.library.annotation.AuditableOperation;
+import com.example.library.config.LibraryProperties;
 import com.example.library.dto.CheckoutRequest;
 import com.example.library.dto.CheckoutRequestDTO;
 import com.example.library.entity.*;
@@ -19,8 +20,8 @@ import java.util.List;
 @Transactional
 public class LoanService {
 
-    private static final BigDecimal UNPAID_FINES_THRESHOLD = new BigDecimal("10.00");
-    private static final int MAX_CONCURRENT_LOANS = 5;
+    @Autowired
+    private LibraryProperties libraryProperties;
 
     @Autowired
     private LoanRepository loanRepository;
@@ -63,15 +64,15 @@ public class LoanService {
         }
 
         BigDecimal totalUnpaid = fineService.getTotalUnpaidFines(member.getId());
-        if (totalUnpaid.compareTo(UNPAID_FINES_THRESHOLD) > 0) {
+        if (totalUnpaid.compareTo(libraryProperties.getUnpaidFinesThreshold()) > 0) {
             throw new UnpaidFinesException("Member has unpaid fines exceeding threshold: " + totalUnpaid);
         }
 
         long activeLoans = loanRepository.countByMemberIdAndStatusIn(
                 member.getId(), List.of(LoanStatus.ACTIVE, LoanStatus.OVERDUE));
-        if (activeLoans >= MAX_CONCURRENT_LOANS) {
+        if (activeLoans >= libraryProperties.getMaxLoansPerMember()) {
             throw new ConcurrentLoanLimitException(
-                    "Member has reached the maximum of " + MAX_CONCURRENT_LOANS + " concurrent loans.");
+                    "Member has reached the maximum of " + libraryProperties.getMaxLoansPerMember() + " concurrent loans.");
         }
 
         BookCopy copy = req.getBookCopyId() != null

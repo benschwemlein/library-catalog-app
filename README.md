@@ -36,6 +36,18 @@ The backend implements nine GoF patterns across the `com.example.library.pattern
 | **Strategy** | `OverdueFineContext` selects `StandardFineStrategy`, `PremiumFineStrategy`, or `StudentFineStrategy` by membership tier |
 | **Template Method** | `AbstractReportGenerator` — five concrete report generators override hook methods |
 
+## Enterprise patterns
+
+Five patterns common in production Spring Boot applications, each added as a realistic example in the corpus:
+
+| Pattern | What was added |
+|---|---|
+| **@ConfigurationProperties** | `LibraryProperties` binds the `application.library.*` namespace (max loans, fines threshold, renewal limits, etc.) and replaces hardcoded constants in `LoanService`. |
+| **Spring Cache (`@Cacheable`/`@CacheEvict`)** | `CacheConfig` declares six named caches; `BookService.findById` and `findByIsbn` are cached, evicted on update/delete. A `recommendations` cache supports `RecommendationCache`. |
+| **Optimistic locking (`@Version`)** | `@Version Long version` added to `Book`, `BookCopy`, `Loan`, `Hold`, and `Member`. `GlobalExceptionHandler` returns HTTP 409 on `ObjectOptimisticLockingFailureException`. |
+| **Soft deletes** | `Book`, `BookCopy`, and `Member` use Hibernate 6 `@SQLDelete` + `@SQLRestriction("deleted = false")`. Deleting any of these sets `deleted = true` and `deleted_at` instead of removing the row. |
+| **Flyway migrations** | `src/main/resources/db/migration/` contains three versioned SQL scripts (`V1__core_schema.sql`, `V2__circulation_schema.sql`, `V3__features_schema.sql`). Flyway is disabled in dev (H2 uses `create-drop`) and enabled via `application-prod.yml`. |
+
 ## Users (seeded on startup)
 
 | Email | Password | Role |

@@ -2,6 +2,7 @@ package com.example.library.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 
@@ -41,4 +42,8 @@ public class Hold {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pickup_branch_id")
     private LibraryBranch pickupBranch;
+
+    @Version
+    @Column(name = "version")
+    private Long version;
 }

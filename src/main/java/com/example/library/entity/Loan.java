@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -52,4 +53,8 @@ public class Loan {
     @JsonIgnore
     @OneToOne(mappedBy = "loan", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Fine fine;
+
+    @Version
+    @Column(name = "version")
+    private Long version;
 }

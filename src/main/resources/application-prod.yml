@@ -24,9 +24,10 @@ spring:
           batch_size: 50
         order_inserts: true
         order_updates: true
-  liquibase:
+  flyway:
     enabled: true
-    change-log: classpath:db/changelog/db.changelog-master.xml
+    locations: classpath:db/migration
+    validate-on-migrate: true
   h2:
     console:
       enabled: false
