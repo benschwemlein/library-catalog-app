@@ -10,6 +10,22 @@ A library management system built with Spring Boot 3 (Java) and Angular 17 (Type
 - **Frontend:** Angular 17, standalone components, RxJS — 143 TypeScript files
 - **Tests:** Cucumber-JVM + RestAssured (11 feature files, 33 Java step/support files), Jasmine/Karma (frontend)
 
+## Design patterns
+
+The backend implements nine GoF patterns across the `com.example.library.pattern` package, making it a useful corpus for code-navigation queries about pattern usage:
+
+| Pattern | Where used |
+|---|---|
+| **Builder** | `BookSearchCriteria`, `LoanQueryCriteria`, `MemberSearchCriteria`, `ReportCriteria` |
+| **Chain of Responsibility** | `LoanEligibilityChain` — six handlers validate checkout eligibility in sequence |
+| **Command** | `LibraryCommandService` — checkout, pay fine, place hold, renew, transfer copy |
+| **Factory** | `BookCopyFactory`, `MemberFactory`, `NotificationFactory`, `ReportFactory` |
+| **Observer** | `NotificationEventListener`, `AuditEventListener`, `StatisticsEventListener` listen for Spring application events |
+| **Specification** | `IsEligibleToBorrowSpecification`, `IsOverdueSpecification`, `IsPremiumMemberSpecification`, and 13 others |
+| **State** | `LoanStateMachine` and `HoldStateMachine` — enforce valid lifecycle transitions |
+| **Strategy** | `OverdueFineContext` selects `StandardFineStrategy`, `PremiumFineStrategy`, or `StudentFineStrategy` by membership tier |
+| **Template Method** | `AbstractReportGenerator` — five concrete report generators override hook methods |
+
 ## Users (seeded on startup)
 
 | Email | Password | Role |
