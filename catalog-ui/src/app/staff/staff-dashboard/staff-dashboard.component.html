@@ -1,0 +1,131 @@
+<div class="staff-dash">
+
+  <div class="page-header">
+    <h1>Staff Dashboard</h1>
+    <p>Circulation tools and daily operations</p>
+  </div>
+
+  <div *ngIf="loading" class="loading-spinner"><div class="spinner"></div></div>
+
+  <!-- Hero action tiles -->
+  <div class="hero-actions animate-in">
+
+    <button [routerLink]="['/staff/checkout']" class="hero-tile hero-checkout">
+      <div class="hero-tile-bg"></div>
+      <div class="hero-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+      </div>
+      <div class="hero-text">
+        <span class="hero-title">Check Out</span>
+        <span class="hero-desc">Issue books to members</span>
+      </div>
+      <svg class="hero-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+
+    <button [routerLink]="['/staff/returns']" class="hero-tile hero-return">
+      <div class="hero-tile-bg"></div>
+      <div class="hero-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+      </div>
+      <div class="hero-text">
+        <span class="hero-title">Process Return</span>
+        <span class="hero-desc">Accept returned books</span>
+      </div>
+      <svg class="hero-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+
+    <button [routerLink]="['/staff/ill']" class="hero-tile hero-ill">
+      <div class="hero-tile-bg"></div>
+      <div class="hero-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <polyline points="16 3 21 3 21 8"/>
+          <line x1="4" y1="20" x2="21" y2="3"/>
+          <polyline points="21 16 21 21 16 21"/>
+          <line x1="15" y1="15" x2="21" y2="21"/>
+        </svg>
+      </div>
+      <div class="hero-text">
+        <span class="hero-title">ILL Requests</span>
+        <span class="hero-desc">Interlibrary loans</span>
+      </div>
+      <svg class="hero-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+
+  </div>
+
+  <!-- Data panels -->
+  <div *ngIf="!loading" class="panels-grid animate-in" style="animation-delay:0.1s">
+
+    <!-- Today's Checkouts -->
+    <div class="panel">
+      <div class="panel-head">
+        <h2 class="panel-title">Today's Checkouts</h2>
+        <span class="count-badge count-blue">{{ todaysCheckouts.length }}</span>
+      </div>
+      <div *ngIf="todaysCheckouts.length === 0" class="panel-empty">No checkouts today yet.</div>
+      <table *ngIf="todaysCheckouts.length > 0" class="panel-table">
+        <thead><tr><th>Book</th><th>Member</th><th>Due</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let loan of todaysCheckouts | slice:0:10">
+            <td class="td-title">{{ loan.bookTitle }}</td>
+            <td>{{ loan.memberName }}</td>
+            <td class="td-date">{{ loan.dueDate | date:'MMM d' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Holds Ready -->
+    <div class="panel">
+      <div class="panel-head">
+        <h2 class="panel-title">Holds Ready for Pickup</h2>
+        <span class="count-badge count-green">{{ holdsToFulfill.length }}</span>
+      </div>
+      <div *ngIf="holdsToFulfill.length === 0" class="panel-empty">No holds ready for pickup.</div>
+      <table *ngIf="holdsToFulfill.length > 0" class="panel-table">
+        <thead><tr><th>Book</th><th>Member</th><th>Branch</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let hold of holdsToFulfill | slice:0:10">
+            <td class="td-title">{{ hold.bookTitle }}</td>
+            <td>{{ hold.memberName }}</td>
+            <td>{{ hold.pickupBranchName }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Overdue Items -->
+    <div class="panel">
+      <div class="panel-head">
+        <h2 class="panel-title">Overdue Items</h2>
+        <span class="count-badge" [class.count-red]="overdueLoans.length > 0" [class.count-green]="overdueLoans.length === 0">
+          {{ overdueLoans.length }}
+        </span>
+      </div>
+      <div *ngIf="overdueLoans.length === 0" class="panel-empty panel-empty-ok">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        All items returned on time!
+      </div>
+      <table *ngIf="overdueLoans.length > 0" class="panel-table">
+        <thead><tr><th>Book</th><th>Member</th><th>Due</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let loan of overdueLoans">
+            <td class="td-title">{{ loan.bookTitle }}</td>
+            <td>{{ loan.memberName }}</td>
+            <td class="td-overdue">{{ loan.dueDate | date:'MMM d' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>

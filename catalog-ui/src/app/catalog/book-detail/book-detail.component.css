@@ -1,0 +1,73 @@
+.book-detail-page { display:flex; flex-direction:column; gap:32px; }
+.back-link { display:inline-flex; align-items:center; gap:6px; color:#64748b; font-size:0.83rem; cursor:pointer; text-decoration:none; transition:color 0.15s ease; }
+.back-link:hover { color:#a5b4fc; }
+.book-layout { display:grid; grid-template-columns:220px 1fr; gap:36px; align-items:start; }
+.book-cover-col { display:flex; flex-direction:column; gap:16px; }
+.book-cover-wrap { border-radius:12px; overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,0.5); aspect-ratio:2/3; }
+.book-cover-img { width:100%; height:100%; object-fit:cover; display:block; }
+.book-cover-ph { width:100%; height:100%; background:linear-gradient(135deg,#4f46e5,#06b6d4); display:flex; align-items:center; justify-content:center; }
+.cover-letter { font-family:'Playfair Display',serif; font-size:5rem; color:rgba(255,255,255,0.9); font-weight:700; }
+.avail-card { background:#1e293b; border:1px solid rgba(148,163,184,0.1); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:12px; }
+.avail-pill { display:inline-flex; align-items:center; gap:7px; font-size:0.8rem; font-weight:600; padding:5px 12px; border-radius:999px; }
+.avail-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.avail-ok  { background:rgba(16,185,129,0.15); color:#6ee7b7; }
+.avail-ok .avail-dot { background:#10b981; }
+.avail-none { background:rgba(244,63,94,0.15); color:#fda4af; }
+.avail-none .avail-dot { background:#f43f5e; }
+.hold-btn { width:100%; }
+.book-meta-col { display:flex; flex-direction:column; gap:16px; }
+.book-title { font-size:1.9rem; font-weight:700; color:#f1f5f9; margin:0; letter-spacing:-0.025em; line-height:1.2; }
+.book-subtitle { font-size:1.1rem; color:#94a3b8; margin:0; font-style:italic; }
+.book-authors { font-size:1rem; color:#a5b4fc; margin:0; }
+.meta-pills { display:flex; flex-wrap:wrap; gap:8px; }
+.meta-pill { background:rgba(148,163,184,0.1); border-radius:6px; padding:3px 10px; font-size:0.78rem; color:#64748b; }
+.isbn-row { font-size:0.78rem; color:#475569; font-family:'SF Mono',monospace; }
+.genres { display:flex; flex-wrap:wrap; gap:7px; }
+.genre-chip { background:rgba(99,102,241,0.15); color:#a5b4fc; border-radius:6px; padding:3px 10px; font-size:0.75rem; font-weight:600; }
+.rating-row { display:flex; align-items:center; gap:4px; }
+.star { color:#334155; font-size:1.1rem; }
+.star-filled { color:#f59e0b; }
+.rating-value { font-size:0.83rem; color:#94a3b8; margin-left:6px; }
+.description-section { margin-top:4px; }
+.section-heading { font-size:1rem; font-weight:700; color:#f1f5f9; margin:0 0 12px; }
+.description-text { font-size:0.9rem; color:#94a3b8; line-height:1.7; margin:0; }
+.sub-section { background:#1e293b; border:1px solid rgba(148,163,184,0.1); border-radius:16px; padding:24px; }
+.sub-section .section-heading { margin-bottom:16px; }
+.sub-table { width:100%; border-collapse:collapse; font-size:0.83rem; }
+.sub-table th { padding:9px 14px; text-align:left; font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:#475569; border-bottom:1px solid rgba(148,163,184,0.1); }
+.sub-table td { padding:12px 14px; border-bottom:1px solid rgba(148,163,184,0.06); color:#94a3b8; }
+.sub-table tr:last-child td { border-bottom:none; }
+.sub-table tr:hover td { background:rgba(148,163,184,0.03); }
+.td-mono { font-family:'SF Mono',monospace; font-size:0.78rem; color:#64748b; }
+.status-chip { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; padding:2px 8px; border-radius:4px; }
+.chip-ok   { background:rgba(16,185,129,0.18); color:#6ee7b7; }
+.chip-warn { background:rgba(245,158,11,0.18); color:#fcd34d; }
+.empty-note { color:#475569; font-size:0.83rem; }
+.reviews-list { display:flex; flex-direction:column; gap:16px; margin-bottom:24px; }
+.review-card { background:#0f172a; border-radius:12px; padding:18px; }
+.review-header { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+.reviewer-avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#6366f1,#06b6d4); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.9rem; color:#fff; flex-shrink:0; }
+.reviewer-info { display:flex; flex-direction:column; gap:2px; flex:1; }
+.reviewer-info strong { font-size:0.88rem; color:#e2e8f0; }
+.review-date { font-size:0.72rem; color:#475569; }
+.review-stars { display:flex; gap:2px; margin-left:auto; }
+.review-title { font-size:0.9rem; font-weight:600; color:#e2e8f0; margin:0 0 6px; }
+.review-body { font-size:0.83rem; color:#94a3b8; margin:0; line-height:1.6; }
+.write-review { background:#0f172a; border-radius:12px; padding:20px; display:flex; flex-direction:column; gap:12px; margin-top:16px; }
+.star-select { display:flex; gap:6px; }
+.star-pick { cursor:pointer; font-size:1.5rem; transition:color 0.1s; }
+.review-input { background:#1e293b; border:1px solid rgba(148,163,184,0.15); border-radius:8px; color:#f1f5f9; padding:10px 12px; font-size:0.88rem; font-family:inherit; transition:border-color 0.15s ease; width:100%; box-sizing:border-box; }
+.review-input:focus { outline:none; border-color:#6366f1; box-shadow:0 0 0 3px rgba(99,102,241,0.18); }
+.review-textarea { resize:vertical; min-height:100px; }
+.inline-success { color:#6ee7b7; font-size:0.83rem; }
+.inline-error   { color:#f87171; font-size:0.83rem; }
+.checkout-inline { display:flex; flex-direction:column; gap:8px; }
+.checkout-label  { font-size:0.75rem; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.06em; }
+.checkout-input  { background:#0f172a; border:1px solid rgba(148,163,184,0.2); border-radius:8px; color:#f1f5f9; padding:8px 12px; font-size:0.88rem; font-family:'SF Mono',monospace; transition:border-color 0.15s ease; width:100%; box-sizing:border-box; }
+.checkout-input:focus { outline:none; border-color:#6366f1; box-shadow:0 0 0 3px rgba(99,102,241,0.18); }
+.checkout-btns   { display:flex; gap:8px; }
+.btn-sm { padding:7px 14px; font-size:0.78rem; }
+.loading-spinner { display:flex; align-items:center; justify-content:center; padding:60px; }
+.spinner { width:32px; height:32px; border:3px solid rgba(148,163,184,0.12); border-top-color:#6366f1; border-radius:50%; animation:spin 0.8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+@media (max-width:700px) { .book-layout { grid-template-columns:1fr; } .book-cover-col { max-width:200px; } }

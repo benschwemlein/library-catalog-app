@@ -1,0 +1,42 @@
+# Test profile - H2 in-memory, no Liquibase, fast startup, fixed JWT secret
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  liquibase:
+    enabled: false
+  mail:
+    host: localhost
+    port: 3025
+
+logging:
+  level:
+    com.example.library: WARN
+    com.example.catalog: WARN
+    org.hibernate.SQL: WARN
+    org.springframework.security: WARN
+
+application:
+  security:
+    jwt:
+      secret-key: test-secret-key-exactly-256-bits-long-for-testing-purposes-only-here-x
+      expiration: 3600000
+      refresh-token:
+        expiration: 7200000
+  library:
+    max-loans-per-member: 8
+    default-loan-period-days: 21
+    overdue-fine-grace-period-days: 1
+    max-renewals: 3
+    hold-expiry-days: 7
+    recommendation-cache-ttl-minutes: 30
+    unpaid-fines-threshold: "10.00"

@@ -1,0 +1,70 @@
+<div class="wizard-page">
+  <div class="page-header"><h1>Process Return</h1><p>Scan a barcode to find the loan and record the return</p></div>
+  <div class="step-track">
+    <div class="step-item" [class.step-active]="step >= 1" [class.step-done]="step > 1">
+      <div class="step-circle"><svg *ngIf="step > 1" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span *ngIf="step <= 1">1</span></div>
+      <span class="step-label">Scan Book</span>
+    </div>
+    <div class="step-line" [class.line-done]="step > 1"></div>
+    <div class="step-item" [class.step-active]="step >= 2" [class.step-done]="step > 2">
+      <div class="step-circle"><svg *ngIf="step > 2" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span *ngIf="step <= 2">2</span></div>
+      <span class="step-label">Assess &amp; Return</span>
+    </div>
+    <div class="step-line" [class.line-done]="step > 2"></div>
+    <div class="step-item" [class.step-active]="step >= 3">
+      <div class="step-circle"><span>3</span></div>
+      <span class="step-label">Complete</span>
+    </div>
+  </div>
+  <div *ngIf="step === 1" class="wizard-card animate-in">
+    <div class="wizard-card-icon wizard-icon-teal"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/><line x1="15" y1="9" x2="15" y2="21"/></svg></div>
+    <h3>Scan Book Barcode</h3>
+    <p class="wizard-hint">Enter the barcode to find the active loan</p>
+    <div class="wizard-input-row">
+      <input type="text" [(ngModel)]="barcode" placeholder="e.g. BC-00012" (keyup.enter)="findLoan()" class="wizard-input" autofocus />
+      <button (click)="findLoan()" [disabled]="lookupLoading || !barcode.trim()" class="btn btn-primary">{{ lookupLoading ? 'Looking up...' : 'Find Loan' }}</button>
+    </div>
+    <div *ngIf="lookupError" class="wizard-error">{{ lookupError }}</div>
+  </div>
+  <div *ngIf="step === 2 && foundLoan" class="wizard-card animate-in">
+    <h3>Review and Return</h3>
+    <div class="confirm-panel">
+      <div class="confirm-row"><span class="confirm-label">Book</span><span class="confirm-value">{{ foundLoan.bookTitle }}</span></div>
+      <div class="confirm-row"><span class="confirm-label">Member</span><span class="confirm-value">{{ foundLoan.memberName }} <span class="confirm-sub">#{{ foundLoan.membershipNumber }}</span></span></div>
+      <div class="confirm-row"><span class="confirm-label">Checked Out</span><span class="confirm-value">{{ foundLoan.checkoutDate | date:'mediumDate' }}</span></div>
+      <div class="confirm-row">
+        <span class="confirm-label">Due Date</span>
+        <span class="confirm-value" [class.confirm-warn]="isOverdue(foundLoan)">
+          {{ foundLoan.dueDate | date:'mediumDate' }}
+          <span *ngIf="isOverdue(foundLoan)" class="overdue-tag">({{ getDaysOverdue(foundLoan) }} days overdue)</span>
+        </span>
+      </div>
+    </div>
+    <div *ngIf="estimatedFine" class="fine-alert">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Overdue fine: <strong>{{ estimatedFine.amount | currency }}</strong> for {{ estimatedFine.daysOverdue }} days overdue
+    </div>
+    <div class="condition-row">
+      <label class="condition-label">Book Condition on Return</label>
+      <select [(ngModel)]="condition" class="wizard-input">
+        <option *ngFor="let c of conditions" [value]="c">{{ c }}</option>
+      </select>
+    </div>
+    <div *ngIf="returnError" class="wizard-error">{{ returnError }}</div>
+    <div class="wizard-actions">
+      <button (click)="completeReturn()" [disabled]="returnLoading" class="btn btn-primary">{{ returnLoading ? 'Processing...' : 'Complete Return' }}</button>
+      <button (click)="reset()" class="btn btn-secondary">Cancel</button>
+    </div>
+  </div>
+  <div *ngIf="step === 3 && completedReturn" class="wizard-card wizard-success animate-in">
+    <div class="success-circle"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <h3>Return Processed!</h3>
+    <div class="receipt-panel">
+      <div class="receipt-row"><span>Book</span><strong>{{ completedReturn.bookTitle }}</strong></div>
+      <div class="receipt-row"><span>Member</span><strong>{{ completedReturn.memberName }}</strong></div>
+      <div class="receipt-row"><span>Returned</span><strong>{{ completedReturn.returnDate | date:'medium' }}</strong></div>
+      <div class="receipt-row" *ngIf="completedReturn.fineAmount && completedReturn.fineAmount > 0"><span>Fine Issued</span><strong class="confirm-warn">{{ completedReturn.fineAmount | currency }}</strong></div>
+    </div>
+    <button (click)="reset()" class="btn btn-primary">Process Another Return</button>
+  </div>
+</div>

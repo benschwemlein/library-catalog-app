@@ -1,0 +1,88 @@
+# Production profile — MySQL, connection pool, no SQL logging, restricted actuator
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/library_catalog?useSSL=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:library_user}
+    password: ${DB_PASSWORD:changeme}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      pool-name: LibraryHikariPool
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      leak-detection-threshold: 60000
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
+  h2:
+    console:
+      enabled: false
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+
+server:
+  port: ${PORT:8080}
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/plain
+    min-response-size: 1024
+
+application:
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET}
+      expiration: 86400000
+      refresh-token:
+        expiration: 604800000
+  library:
+    max-loans-per-member: 8
+    default-loan-period-days: 21
+    overdue-fine-grace-period-days: 1
+    max-renewals: 3
+    hold-expiry-days: 7
+    recommendation-cache-ttl-minutes: 30
+    unpaid-fines-threshold: "10.00"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: never
+  server:
+    port: ${MANAGEMENT_PORT:8081}
+
+logging:
+  level:
+    root: WARN
+    com.example.library: INFO
+    com.example.catalog: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+  pattern:
+    console: '{"timestamp":"%d{yyyy-MM-dd HH:mm:ss.SSS}","level":"%level","thread":"%thread","logger":"%logger{36}","message":"%message","exception":"%xException{10}"}%n'
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

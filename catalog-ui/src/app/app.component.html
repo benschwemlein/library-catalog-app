@@ -1,0 +1,110 @@
+<div class="app-container">
+  <header class="header">
+    <a class="title" routerLink="/books">City Library</a>
+
+    <nav class="navbar">
+      <ng-container *ngIf="isLoggedIn">
+
+        <div class="nav-group">
+          <a routerLink="/books" routerLinkActive="active">Books</a>
+          <div class="dropdown">
+            <a routerLink="/books">Browse All</a>
+            <a routerLink="/books/search">Search</a>
+            <a routerLink="/books/new-arrivals">New Arrivals</a>
+            <a routerLink="/periodicals">Periodicals</a>
+            <a routerLink="/digital">Digital</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <a routerLink="/member" routerLinkActive="active">My Account</a>
+          <div class="dropdown">
+            <a routerLink="/member">Dashboard</a>
+            <a routerLink="/member/loans">Current Loans</a>
+            <a routerLink="/member/loan-history">Loan History</a>
+            <a routerLink="/member/holds">Holds</a>
+            <a routerLink="/member/fines">Fines</a>
+            <a routerLink="/member/notifications">Notifications</a>
+            <a routerLink="/member/profile">Profile</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <a routerLink="/events" routerLinkActive="active">Events</a>
+          <div class="dropdown">
+            <a routerLink="/events">All Events</a>
+            <a routerLink="/book-clubs">Book Clubs</a>
+            <a routerLink="/challenges">Challenges</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <a routerLink="/branches" routerLinkActive="active">Branches</a>
+          <div class="dropdown">
+            <a routerLink="/branches">All Branches</a>
+            <a routerLink="/interlibrary">Interlibrary Loan</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <a routerLink="/reading-lists" routerLinkActive="active">Lists</a>
+          <div class="dropdown">
+            <a routerLink="/reading-lists">My Lists</a>
+            <a routerLink="/reading-lists/public">Public Lists</a>
+            <a routerLink="/recommendations">Recommendations</a>
+          </div>
+        </div>
+
+        <div class="nav-group" *ngIf="isStaff">
+          <a routerLink="/staff" routerLinkActive="active">Staff</a>
+          <div class="dropdown">
+            <a routerLink="/staff">Dashboard</a>
+            <a routerLink="/staff/checkout">Checkout</a>
+            <a routerLink="/staff/returns">Returns</a>
+            <a routerLink="/staff/ill">ILL Management</a>
+          </div>
+        </div>
+
+        <div class="nav-group" *ngIf="isAdmin">
+          <a routerLink="/admin" routerLinkActive="active">Admin</a>
+          <div class="dropdown">
+            <a routerLink="/admin">Dashboard</a>
+            <a routerLink="/admin/members">Members</a>
+            <a routerLink="/admin/inventory">Inventory</a>
+            <a routerLink="/admin/reports">Reports</a>
+            <a routerLink="/admin/events">Events Mgmt</a>
+            <a routerLink="/admin/acquisitions">Acquisitions</a>
+            <a routerLink="/admin/donations">Donations</a>
+          </div>
+        </div>
+
+      </ng-container>
+    </nav>
+
+    <!-- Auth section is OUTSIDE the scrollable navbar so it never overflows -->
+    <div class="nav-auth">
+      <ng-container *ngIf="isLoggedIn; else loggedOut">
+        <div class="user-chip">
+          <div class="user-avatar" *ngIf="firstName && lastName">{{ firstName[0] }}{{ lastName[0] }}</div>
+          <span class="user-name" *ngIf="firstName && lastName">{{ firstName }}</span>
+          <button (click)="logout()" class="logout-btn">Log Out</button>
+        </div>
+      </ng-container>
+      <ng-template #loggedOut>
+        <a routerLink="/login" routerLinkActive="active">Login</a>
+        <a routerLink="/register" routerLinkActive="active" class="btn-register">Register</a>
+      </ng-template>
+    </div>
+
+  </header>
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      &copy; 2024 City Library System
+    </div>
+  </footer>
+</div>

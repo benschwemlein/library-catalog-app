@@ -1,0 +1,213 @@
+<div style="padding: 24px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif;">
+
+  <a routerLink="/challenges"
+    style="display: inline-flex; align-items: center; gap: 6px; color: #7c3aed; font-size: 14px; font-weight: 500; text-decoration: none; margin-bottom: 24px;">
+    ← All Challenges
+  </a>
+
+  <!-- Loading -->
+  <div *ngIf="loadingChallenge" style="display: flex; align-items: center; gap: 12px; padding: 60px 0; justify-content: center;">
+    <div style="width: 28px; height: 28px; border: 3px solid #e5e7eb; border-top-color: #7c3aed; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+    <span style="color: #6b7280;">Loading challenge...</span>
+    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="challengeError && !loadingChallenge"
+    style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; color: #991b1b; font-size: 14px; margin-bottom: 20px;">
+    {{ challengeError }}
+  </div>
+
+  <div *ngIf="challenge && !loadingChallenge">
+
+    <!-- Challenge header card -->
+    <div style="background: white; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); overflow: hidden; margin-bottom: 24px;">
+      <div style="background: linear-gradient(135deg, #7c3aed, #4f46e5); padding: 28px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
+          <div>
+            <h1 style="margin: 0 0 6px; font-size: 26px; font-weight: 700; color: white;">{{ challenge.name }}</h1>
+            <div style="font-size: 13px; color: rgba(255,255,255,0.75);">
+              {{ formatDate(challenge.startDate) }} – {{ formatDate(challenge.endDate) }}
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0;">
+            <span style="background: rgba(255,255,255,0.15); font-size: 12px; color: white; padding: 4px 12px; border-radius: 10px; font-weight: 600;">
+              {{ getDaysRemaining() }} days left
+            </span>
+            <span *ngIf="challenge.badge"
+              style="background: rgba(217,119,6,0.3); font-size: 12px; color: #fde68a; padding: 4px 12px; border-radius: 10px; font-weight: 600;">
+              🏅 {{ challenge.badge }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding: 20px 28px; display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start;">
+        <div style="flex: 1; min-width: 200px;">
+          <p *ngIf="challenge.description" style="margin: 0 0 12px; font-size: 14px; color: #4b5563; line-height: 1.7;">
+            {{ challenge.description }}
+          </p>
+          <div *ngIf="challenge.targetGenres"
+            style="font-size: 13px; color: #6b7280; display: flex; align-items: center; gap: 6px;">
+            <span>🏷️</span><span>Focus genres: {{ challenge.targetGenres }}</span>
+          </div>
+        </div>
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; flex-shrink: 0;">
+          <div style="text-align: center;">
+            <div style="font-size: 24px; font-weight: 700; color: #7c3aed;">{{ challenge.targetBooks }}</div>
+            <div style="font-size: 12px; color: #6b7280; margin-top: 2px;">Books Target</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 24px; font-weight: 700; color: #0891b2;">{{ challenge.enrolledCount }}</div>
+            <div style="font-size: 12px; color: #6b7280; margin-top: 2px;">Enrolled</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 24px; font-weight: 700; color: #059669;">{{ challenge.completedCount }}</div>
+            <div style="font-size: 12px; color: #6b7280; margin-top: 2px;">Completed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- My Progress -->
+    <div *ngIf="participation"
+      style="background: white; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); padding: 24px 28px; margin-bottom: 24px;">
+      <h2 style="margin: 0 0 18px; font-size: 18px; font-weight: 700; color: #111827;">My Progress</h2>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+        <span style="font-size: 14px; color: #374151; font-weight: 500;">
+          {{ participation.completedBooks }} of {{ participation.targetBooks }} books completed
+        </span>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span *ngIf="participation.badgeEarned"
+            style="font-size: 13px; color: #d97706; background: #fffbeb; padding: 4px 12px; border-radius: 8px; font-weight: 600;">
+            🏅 Badge Earned!
+          </span>
+          <span style="font-size: 20px; font-weight: 700;"
+            [style.color]="getProgressColor(getProgressPercent())">
+            {{ getProgressPercent() | number:'1.0-0' }}%
+          </span>
+        </div>
+      </div>
+
+      <div style="background: #e5e7eb; border-radius: 8px; height: 14px; overflow: hidden; margin-bottom: 8px;">
+        <div [style.width]="getProgressPercent() + '%'"
+          [style.background]="getProgressColor(getProgressPercent())"
+          style="height: 100%; border-radius: 8px; transition: width 0.5s; position: relative;">
+          <div *ngIf="getProgressPercent() >= 10"
+            style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 10px; font-weight: 700; color: white;">
+            {{ getProgressPercent() | number:'1.0-0' }}%
+          </div>
+        </div>
+      </div>
+      <div style="font-size: 12px; color: #9ca3af;">Enrolled {{ formatDate(participation.enrollDate) }}</div>
+    </div>
+
+    <!-- Log a Book -->
+    <div style="background: white; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); padding: 24px 28px; margin-bottom: 24px;">
+      <h2 style="margin: 0 0 4px; font-size: 18px; font-weight: 700; color: #111827;">Log a Book</h2>
+      <p style="margin: 0 0 18px; font-size: 13px; color: #6b7280;">Record a book you've finished toward this challenge.</p>
+
+      <div *ngIf="logSuccess"
+        style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 12px 16px; color: #065f46; font-size: 14px; font-weight: 500; margin-bottom: 16px;">
+        {{ logSuccess }}
+      </div>
+      <div *ngIf="logError"
+        style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px 16px; color: #991b1b; font-size: 14px; margin-bottom: 16px;">
+        {{ logError }}
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div>
+          <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 5px;">
+            Book Title <span style="color: #dc2626;">*</span>
+          </label>
+          <input type="text" [(ngModel)]="bookTitle" placeholder="Enter the book title..."
+            style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; box-sizing: border-box; font-family: inherit;" />
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 5px;">
+            Date Completed <span style="color: #dc2626;">*</span>
+          </label>
+          <input type="date" [(ngModel)]="completedDate"
+            style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; font-family: inherit;" />
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 5px;">
+            Notes (optional)
+          </label>
+          <textarea [(ngModel)]="logNotes" rows="2" placeholder="Any thoughts on the book?"
+            style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; resize: none; box-sizing: border-box; font-family: inherit;"></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end;">
+          <button (click)="logBook()"
+            [disabled]="!bookTitle.trim() || !completedDate || loggingBook"
+            [style.opacity]="!bookTitle.trim() || !completedDate || loggingBook ? '0.5' : '1'"
+            [style.cursor]="!bookTitle.trim() || !completedDate || loggingBook ? 'not-allowed' : 'pointer'"
+            style="padding: 10px 24px; background: #7c3aed; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600;">
+            {{ loggingBook ? 'Logging...' : 'Log Book' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leaderboard -->
+    <div style="background: white; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); padding: 24px 28px;">
+      <h2 style="margin: 0 0 18px; font-size: 18px; font-weight: 700; color: #111827;">Leaderboard</h2>
+
+      <div *ngIf="loadingLeaderboard" style="color: #6b7280; font-size: 14px; padding: 12px 0;">Loading leaderboard...</div>
+      <div *ngIf="leaderboardError && !loadingLeaderboard" style="color: #dc2626; font-size: 14px;">{{ leaderboardError }}</div>
+
+      <div *ngIf="!loadingLeaderboard && !leaderboardError && leaderboard.length === 0"
+        style="text-align: center; padding: 32px 0; color: #6b7280; font-size: 14px;">
+        No entries yet — log a book to be the first on the board!
+      </div>
+
+      <div *ngIf="!loadingLeaderboard && leaderboard.length > 0" style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+          <thead>
+            <tr style="border-bottom: 2px solid #e5e7eb;">
+              <th style="padding: 8px 12px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.4px; width: 60px;">Rank</th>
+              <th style="padding: 8px 12px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.4px;">Member</th>
+              <th style="padding: 8px 12px; text-align: center; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.4px; width: 100px;">Books</th>
+              <th style="padding: 8px 12px; text-align: center; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.4px; width: 100px;">Badge</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let entry of leaderboard; trackBy: trackByRank"
+              [style.background]="isCurrentUser(entry) ? '#faf5ff' : 'white'"
+              style="border-bottom: 1px solid #f3f4f6;">
+              <td style="padding: 12px 12px; font-size: 18px; text-align: center;">
+                {{ getRankLabel(entry.rank) }}
+              </td>
+              <td style="padding: 12px 12px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-weight: 600; color: #111827;">{{ entry.memberName }}</span>
+                  <span *ngIf="isCurrentUser(entry)"
+                    style="font-size: 11px; color: #7c3aed; background: #ede9fe; padding: 2px 7px; border-radius: 6px; font-weight: 600;">
+                    You
+                  </span>
+                </div>
+                <div *ngIf="entry.completedDate"
+                  style="font-size: 12px; color: #9ca3af; margin-top: 1px;">
+                  Finished {{ formatDate(entry.completedDate) }}
+                </div>
+              </td>
+              <td style="padding: 12px 12px; text-align: center; font-weight: 700; color: #374151; font-size: 16px;">
+                {{ entry.completedBooks }}
+              </td>
+              <td style="padding: 12px 12px; text-align: center;">
+                <span *ngIf="entry.badgeEarned" title="Badge earned">🏅</span>
+                <span *ngIf="!entry.badgeEarned" style="color: #d1d5db; font-size: 13px;">—</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>

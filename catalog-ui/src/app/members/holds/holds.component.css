@@ -1,0 +1,19 @@
+.loading-spinner { display:flex; align-items:center; justify-content:center; padding:60px; }
+.spinner { width:32px; height:32px; border:3px solid rgba(148,163,184,0.12); border-top-color:#6366f1; border-radius:50%; animation:spin 0.8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.empty-state { display:flex; flex-direction:column; align-items:center; gap:12px; padding:60px; text-align:center; color:#475569; }
+.table { width:100%; border-collapse:collapse; font-size:0.83rem; background:#1e293b; border:1px solid rgba(148,163,184,0.1); border-radius:12px; overflow:hidden; }
+.table th { padding:10px 14px; text-align:left; font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:#475569; border-bottom:1px solid rgba(148,163,184,0.1); }
+.table td { padding:12px 14px; border-bottom:1px solid rgba(148,163,184,0.06); color:#94a3b8; vertical-align:middle; }
+.table tr:last-child td { border-bottom:none; }
+.table tr:hover td { background:rgba(148,163,184,0.03); }
+.badge { display:inline-block; font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; padding:2px 8px; border-radius:4px; }
+.badge-success { background:rgba(16,185,129,0.18); color:#6ee7b7; }
+.badge-warning { background:rgba(245,158,11,0.18); color:#fcd34d; }
+.badge-danger  { background:rgba(244,63,94,0.18);  color:#fda4af; }
+.badge-secondary { background:rgba(100,116,139,0.2); color:#94a3b8; }
+.btn-sm { padding:5px 10px; font-size:0.75rem; border-radius:7px; border:none; cursor:pointer; font-weight:600; }
+.btn-danger.btn-sm { background:rgba(244,63,94,0.18); color:#fda4af; border:1px solid rgba(244,63,94,0.25); }
+.btn-danger.btn-sm:disabled { opacity:0.4; cursor:not-allowed; }
+.action-error { font-size:0.72rem; color:#f87171; margin-top:4px; }
+.ready-notice { display:inline-block; font-size:0.72rem; color:#6ee7b7; font-weight:600; margin-top:4px; }

@@ -1,0 +1,102 @@
+<div class="admin-members-container">
+  <h2>Member Management</h2>
+
+  <div class="toolbar">
+    <div class="search-bar">
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        placeholder="Search by name, email, or membership number..."
+        (keyup.enter)="searchMembers()"
+        class="form-input"
+      />
+      <button (click)="searchMembers()" class="btn btn-primary">Search</button>
+      <button (click)="searchQuery = ''; loadMembers()" class="btn btn-secondary">Clear</button>
+    </div>
+    <button (click)="createOpen = !createOpen" class="create-btn">+ Register Member</button>
+  </div>
+
+  <div *ngIf="createOpen" class="create-panel animate-in">
+    <h3 class="create-heading">Register New Member</h3>
+    <div class="create-grid">
+      <div class="create-field">
+        <label class="create-label">First Name *</label>
+        <input [(ngModel)]="newMember.firstName" placeholder="First name" class="create-input" />
+      </div>
+      <div class="create-field">
+        <label class="create-label">Last Name *</label>
+        <input [(ngModel)]="newMember.lastName" placeholder="Last name" class="create-input" />
+      </div>
+      <div class="create-field">
+        <label class="create-label">Email *</label>
+        <input type="email" [(ngModel)]="newMember.email" placeholder="email@example.com" class="create-input" />
+      </div>
+      <div class="create-field">
+        <label class="create-label">Phone</label>
+        <input [(ngModel)]="newMember.phone" placeholder="(555) 000-0000" class="create-input" />
+      </div>
+      <div class="create-field">
+        <label class="create-label">Membership Tier</label>
+        <select [(ngModel)]="newMember.membershipTier" class="create-input">
+          <option *ngFor="let t of memberTiers" [value]="t">{{ t }}</option>
+        </select>
+      </div>
+    </div>
+    <p class="create-note">Default password: Welcome123!</p>
+    <div *ngIf="createError" class="create-error">{{ createError }}</div>
+    <div class="create-actions">
+      <button (click)="registerMember()" [disabled]="creating" class="btn btn-primary">{{ creating ? 'Registering...' : 'Register Member' }}</button>
+      <button (click)="createOpen = false; createError = ''" class="btn btn-secondary">Cancel</button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-spinner"><div class="spinner"></div></div>
+
+  <div *ngIf="!loading && members.length === 0" class="empty-state">No members found.</div>
+
+  <table *ngIf="!loading && members.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Member #</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Tier</th>
+        <th>Active Loans</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let member of members">
+        <td>{{ member.membershipNumber }}</td>
+        <td>{{ member.firstName }} {{ member.lastName }}</td>
+        <td>{{ member.email }}</td>
+        <td><span class="badge badge-tier">{{ member.membershipTier }}</span></td>
+        <td>{{ member.activeLoansCount }}</td>
+        <td>
+          <span class="badge" [class.badge-success]="member.active" [class.badge-danger]="!member.active">
+            {{ member.active ? 'Active' : 'Suspended' }}
+          </span>
+        </td>
+        <td>
+          <div class="action-buttons">
+            <button [routerLink]="['/admin/members', member.id]" class="btn btn-sm btn-secondary">View</button>
+            <button
+              *ngIf="member.active"
+              (click)="suspendMember(member.id)"
+              [disabled]="actionLoading[member.id]"
+              class="btn btn-sm btn-warning"
+            >Suspend</button>
+            <button
+              *ngIf="!member.active"
+              (click)="reactivateMember(member.id)"
+              [disabled]="actionLoading[member.id]"
+              class="btn btn-sm btn-success"
+            >Reactivate</button>
+          </div>
+          <div *ngIf="actionError[member.id]" class="action-error">{{ actionError[member.id] }}</div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

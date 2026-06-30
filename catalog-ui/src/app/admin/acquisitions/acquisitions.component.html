@@ -1,0 +1,333 @@
+<div style="padding: 24px; font-family: sans-serif; max-width: 1200px; margin: 0 auto;">
+
+  <!-- Page Title -->
+  <h1 style="font-size: 1.75rem; font-weight: 700; color: #1e293b; margin: 0 0 24px 0;">Acquisitions Management</h1>
+
+  <!-- Error Banner -->
+  <div
+    *ngIf="error"
+    style="background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 6px; padding: 12px 18px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;"
+  >
+    <span>{{ error }}</span>
+    <button (click)="error = ''" style="background: none; border: none; cursor: pointer; font-size: 1.1rem; color: #991b1b;">&#x2715;</button>
+  </div>
+
+  <!-- Success Banner -->
+  <div
+    *ngIf="successMessage"
+    style="background: #dcfce7; color: #166534; border: 1px solid #86efac; border-radius: 6px; padding: 12px 18px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;"
+  >
+    <span>{{ successMessage }}</span>
+    <button (click)="successMessage = ''" style="background: none; border: none; cursor: pointer; font-size: 1.1rem; color: #166534;">&#x2715;</button>
+  </div>
+
+  <!-- Tab Bar -->
+  <div style="display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 24px; gap: 0;">
+    <button
+      (click)="activeTab = 'requests'"
+      [style.color]="activeTab === 'requests' ? '#3b82f6' : '#64748b'"
+      [style.border-bottom]="activeTab === 'requests' ? '2px solid #3b82f6' : '2px solid transparent'"
+      style="padding: 10px 24px; font-size: 0.95rem; font-weight: 600; background: none; border-top: none; border-left: none; border-right: none; cursor: pointer; margin-bottom: -2px; transition: color 0.15s;"
+    >
+      Acquisition Requests
+    </button>
+    <button
+      (click)="activeTab = 'orders'"
+      [style.color]="activeTab === 'orders' ? '#3b82f6' : '#64748b'"
+      [style.border-bottom]="activeTab === 'orders' ? '2px solid #3b82f6' : '2px solid transparent'"
+      style="padding: 10px 24px; font-size: 0.95rem; font-weight: 600; background: none; border-top: none; border-left: none; border-right: none; cursor: pointer; margin-bottom: -2px; transition: color 0.15s;"
+    >
+      Purchase Orders
+    </button>
+  </div>
+
+  <!-- ======================== REQUESTS TAB ======================== -->
+  <div *ngIf="activeTab === 'requests'">
+
+    <!-- Filter Row -->
+    <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;">
+      <select
+        [(ngModel)]="statusFilter"
+        (change)="onStatusFilterChange()"
+        style="padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; background: white; outline: none; min-width: 180px;"
+      >
+        <option value="">All Statuses</option>
+        <option value="PENDING">Pending</option>
+        <option value="UNDER_REVIEW">Under Review</option>
+        <option value="APPROVED">Approved</option>
+        <option value="ORDERED">Ordered</option>
+        <option value="RECEIVED">Received</option>
+        <option value="DENIED">Denied</option>
+      </select>
+      <button
+        (click)="loadRequests()"
+        style="padding: 8px 18px; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; font-weight: 500; cursor: pointer;"
+      >
+        Refresh
+      </button>
+    </div>
+
+    <!-- Create Purchase Order Button -->
+    <div *ngIf="selectedRequests.length > 0" style="margin-bottom: 16px;">
+      <button
+        (click)="showOrderForm = !showOrderForm"
+        style="padding: 9px 20px; background: #7c3aed; color: white; border: none; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer;"
+      >
+        Create Purchase Order ({{ selectedRequests.length }} selected)
+      </button>
+    </div>
+
+    <!-- Order Creation Form -->
+    <div
+      *ngIf="showOrderForm"
+      style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 20px;"
+    >
+      <h3 style="margin: 0 0 16px 0; font-size: 1rem; font-weight: 700; color: #1e293b;">New Purchase Order</h3>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;">
+        <div style="display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 160px;">
+          <label style="font-size: 0.8rem; font-weight: 600; color: #475569;">Supplier <span style="color:#f43f5e;">*</span></label>
+          <input
+            type="text"
+            [(ngModel)]="orderFormData.supplier"
+            name="supplier"
+            placeholder="Supplier name"
+            #supplierField="ngModel"
+            required
+            [style.border-color]="supplierField.invalid && supplierField.touched ? '#f43f5e' : '#cbd5e1'"
+            style="padding: 8px 12px; border: 1px solid; border-radius: 6px; font-size: 0.9rem; outline: none;"
+            (blur)="supplierField.control.markAsTouched()"
+          />
+          <div *ngIf="supplierField.invalid && supplierField.touched"
+            style="color: #f43f5e; font-size: 0.76rem; margin-top: 2px;">
+            Supplier is required
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 160px;">
+          <label style="font-size: 0.8rem; font-weight: 600; color: #475569;">Expected Delivery</label>
+          <input
+            type="date"
+            [(ngModel)]="orderFormData.expectedDelivery"
+            style="padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; outline: none;"
+          />
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 160px;">
+          <label style="font-size: 0.8rem; font-weight: 600; color: #475569;">Submitted By</label>
+          <input
+            type="text"
+            [(ngModel)]="orderFormData.submittedBy"
+            placeholder="Staff name"
+            style="padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; outline: none;"
+          />
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button
+            (click)="createPurchaseOrder()"
+            [disabled]="!orderFormData.supplier"
+            style="padding: 8px 18px; background: #7c3aed; color: white; border: none; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer;"
+          >
+            Create
+          </button>
+          <button
+            (click)="showOrderForm = false"
+            style="padding: 8px 14px; background: white; color: #475569; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; cursor: pointer;"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" style="text-align: center; padding: 40px; color: #64748b;">Loading requests...</div>
+
+    <!-- Requests Table -->
+    <div *ngIf="!loading" style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+
+      <!-- Empty State -->
+      <div
+        *ngIf="requests.length === 0"
+        style="padding: 48px; text-align: center; color: #94a3b8;"
+      >
+        <div style="font-size: 2rem; margin-bottom: 12px;">📥</div>
+        <div style="font-size: 0.95rem; font-weight: 500;">No acquisition requests found</div>
+        <div style="font-size: 0.82rem; margin-top: 4px;">Try changing the status filter.</div>
+      </div>
+
+      <div *ngIf="requests.length > 0" style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+          <thead>
+            <tr style="background: #f8fafc; text-align: left; border-bottom: 1px solid #e2e8f0;">
+              <th style="padding: 11px 12px; font-weight: 600; color: #475569; width: 36px;"></th>
+              <th style="padding: 11px 12px; font-weight: 600; color: #475569;">Title</th>
+              <th style="padding: 11px 12px; font-weight: 600; color: #475569;">Author</th>
+              <th style="padding: 11px 12px; font-weight: 600; color: #475569;">ISBN</th>
+              <th style="padding: 11px 12px; font-weight: 600; color: #475569;">Priority</th>
+              <th style="padding: 11px 12px; font-weight: 600; color: #475569;">Requested By</th>
+              <th style="padding: 11px 12px; font-weight: 600; color: #475569;">Status</th>
+              <th style="padding: 11px 12px; font-weight: 600; color: #475569;">Review Note</th>
+              <th style="padding: 11px 12px; font-weight: 600; color: #475569;">Est. Cost</th>
+              <th style="padding: 11px 12px; font-weight: 600; color: #475569;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let req of requests; let i = index"
+              [style.background]="isSelected(req.id) ? '#f5f3ff' : (i % 2 === 0 ? 'white' : '#f8fafc')"
+              style="border-bottom: 1px solid #f1f5f9;"
+            >
+              <!-- Checkbox -->
+              <td style="padding: 10px 12px; text-align: center;">
+                <input
+                  type="checkbox"
+                  [checked]="isSelected(req.id)"
+                  (change)="toggleRequestSelection(req.id)"
+                  [disabled]="req.status !== 'APPROVED'"
+                  style="cursor: pointer; width: 15px; height: 15px;"
+                />
+              </td>
+              <!-- Title -->
+              <td style="padding: 10px 12px; color: #1e293b; font-weight: 500; max-width: 200px;">
+                <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" [title]="req.title">{{ req.title }}</div>
+              </td>
+              <!-- Author -->
+              <td style="padding: 10px 12px; color: #475569;">{{ req.author || '—' }}</td>
+              <!-- ISBN -->
+              <td style="padding: 10px 12px; color: #475569; white-space: nowrap;">{{ req.isbn || '—' }}</td>
+              <!-- Priority -->
+              <td style="padding: 10px 12px;">
+                <span
+                  [ngStyle]="getPriorityBadgeStyle(req.priority)"
+                  style="font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; white-space: nowrap;"
+                >{{ req.priority }}</span>
+              </td>
+              <!-- Requested By -->
+              <td style="padding: 10px 12px; color: #475569;">
+                {{ req.requestedByMemberName || req.requestedByStaff || '—' }}
+              </td>
+              <!-- Status -->
+              <td style="padding: 10px 12px;">
+                <span
+                  [ngStyle]="getStatusBadgeStyle(req.status)"
+                  style="font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; white-space: nowrap;"
+                >{{ req.status | titlecase }}</span>
+              </td>
+              <!-- Review Note -->
+              <td style="padding: 10px 12px; color: #64748b; max-width: 160px;">
+                <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" [title]="req.reviewNote || ''">
+                  {{ req.reviewNote || '—' }}
+                </div>
+              </td>
+              <!-- Est. Cost -->
+              <td style="padding: 10px 12px; color: #475569; white-space: nowrap;">
+                {{ req.estimatedCost != null ? ('$' + req.estimatedCost.toFixed(2)) : '—' }}
+              </td>
+              <!-- Actions -->
+              <td style="padding: 10px 12px; white-space: nowrap;">
+                <button
+                  *ngIf="req.status === 'PENDING'"
+                  (click)="reviewRequest(req)"
+                  style="padding: 4px 10px; background: #dbeafe; color: #1e40af; border: none; border-radius: 4px; font-size: 0.78rem; font-weight: 600; cursor: pointer; margin-right: 4px;"
+                >Review</button>
+                <button
+                  *ngIf="req.status === 'PENDING' || req.status === 'UNDER_REVIEW'"
+                  (click)="approveRequest(req)"
+                  style="padding: 4px 10px; background: #dcfce7; color: #166534; border: none; border-radius: 4px; font-size: 0.78rem; font-weight: 600; cursor: pointer; margin-right: 4px;"
+                >Approve</button>
+                <button
+                  *ngIf="req.status === 'PENDING' || req.status === 'UNDER_REVIEW'"
+                  (click)="denyRequest(req)"
+                  style="padding: 4px 10px; background: #fee2e2; color: #991b1b; border: none; border-radius: 4px; font-size: 0.78rem; font-weight: 600; cursor: pointer;"
+                >Deny</button>
+                <span
+                  *ngIf="req.status !== 'PENDING' && req.status !== 'UNDER_REVIEW'"
+                  style="color: #94a3b8; font-size: 0.78rem;"
+                >—</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================== ORDERS TAB ======================== -->
+  <div *ngIf="activeTab === 'orders'">
+
+    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+
+      <!-- Empty State -->
+      <div
+        *ngIf="orders.length === 0"
+        style="padding: 48px; text-align: center; color: #94a3b8;"
+      >
+        <div style="font-size: 2rem; margin-bottom: 12px;">📦</div>
+        <div style="font-size: 0.95rem; font-weight: 500;">No purchase orders found</div>
+        <div style="font-size: 0.82rem; margin-top: 4px;">Create a purchase order from approved requests in the Requests tab.</div>
+      </div>
+
+      <div *ngIf="orders.length > 0" style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+          <thead>
+            <tr style="background: #f8fafc; text-align: left; border-bottom: 1px solid #e2e8f0;">
+              <th style="padding: 11px 14px; font-weight: 600; color: #475569;">#</th>
+              <th style="padding: 11px 14px; font-weight: 600; color: #475569;">Supplier</th>
+              <th style="padding: 11px 14px; font-weight: 600; color: #475569;">Order Date</th>
+              <th style="padding: 11px 14px; font-weight: 600; color: #475569;">Expected Delivery</th>
+              <th style="padding: 11px 14px; font-weight: 600; color: #475569;">Total Cost</th>
+              <th style="padding: 11px 14px; font-weight: 600; color: #475569;">Status</th>
+              <th style="padding: 11px 14px; font-weight: 600; color: #475569;"># Items</th>
+              <th style="padding: 11px 14px; font-weight: 600; color: #475569;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let order of orders; let i = index"
+              [style.background]="i % 2 === 0 ? 'white' : '#f8fafc'"
+              style="border-bottom: 1px solid #f1f5f9;"
+            >
+              <!-- ID -->
+              <td style="padding: 11px 14px; color: #94a3b8; font-size: 0.8rem;">#{{ order.id }}</td>
+              <!-- Supplier -->
+              <td style="padding: 11px 14px; color: #1e293b; font-weight: 500;">{{ order.supplier }}</td>
+              <!-- Order Date -->
+              <td style="padding: 11px 14px; color: #475569; white-space: nowrap;">{{ order.orderDate || '—' }}</td>
+              <!-- Expected Delivery -->
+              <td style="padding: 11px 14px; color: #475569; white-space: nowrap;">{{ order.expectedDelivery || '—' }}</td>
+              <!-- Total Cost -->
+              <td style="padding: 11px 14px; color: #1e293b; font-weight: 600; white-space: nowrap;">
+                ${{ order.totalCost.toFixed(2) }}
+              </td>
+              <!-- Status -->
+              <td style="padding: 11px 14px;">
+                <span
+                  [ngStyle]="getStatusBadgeStyle(order.status)"
+                  style="font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; white-space: nowrap;"
+                >{{ order.status }}</span>
+              </td>
+              <!-- Item Count -->
+              <td style="padding: 11px 14px; color: #475569; text-align: center;">{{ order.requestCount }}</td>
+              <!-- Actions -->
+              <td style="padding: 11px 14px; white-space: nowrap;">
+                <button
+                  *ngIf="order.status === 'DRAFT'"
+                  (click)="submitOrder(order)"
+                  style="padding: 5px 12px; background: #dbeafe; color: #1e40af; border: none; border-radius: 4px; font-size: 0.8rem; font-weight: 600; cursor: pointer; margin-right: 6px;"
+                >Submit</button>
+                <button
+                  *ngIf="order.status === 'CONFIRMED' || order.status === 'SHIPPED'"
+                  (click)="receiveOrder(order)"
+                  style="padding: 5px 12px; background: #dcfce7; color: #166534; border: none; border-radius: 4px; font-size: 0.8rem; font-weight: 600; cursor: pointer;"
+                >Receive</button>
+                <span
+                  *ngIf="order.status !== 'DRAFT' && order.status !== 'CONFIRMED' && order.status !== 'SHIPPED'"
+                  style="color: #94a3b8; font-size: 0.8rem;"
+                >—</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>

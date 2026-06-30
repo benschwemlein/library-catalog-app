@@ -1,0 +1,164 @@
+<div class="lists-page">
+
+  <!-- Error banner -->
+  <div *ngIf="error" class="error-banner">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    {{ error }}
+    <button (click)="error = ''" class="error-close">&times;</button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-spinner"><div class="spinner"></div></div>
+
+  <div *ngIf="!loading" class="lists-layout">
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar">
+
+      <div class="sidebar-header">
+        <h2>My Lists</h2>
+        <button (click)="showCreateForm = !showCreateForm" class="btn-new">
+          {{ showCreateForm ? 'Cancel' : '+ New' }}
+        </button>
+      </div>
+
+      <!-- Create form -->
+      <div *ngIf="showCreateForm" class="create-form">
+        <div class="form-field">
+          <label>List name <span class="required-mark">*</span></label>
+          <input [(ngModel)]="newListName" name="newListName" placeholder="Summer reads…"
+            [style.border-color]="listNameTouched && !newListName.trim() ? 'var(--color-rose)' : ''"
+            (blur)="listNameTouched = true" />
+          <div *ngIf="listNameTouched && !newListName.trim()" class="invalid-feedback">
+            List name is required
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Description</label>
+          <textarea [(ngModel)]="newListDescription" placeholder="Optional…" rows="2"></textarea>
+        </div>
+        <div class="form-field">
+          <label>Visibility</label>
+          <select [(ngModel)]="newListVisibility">
+            <option value="PRIVATE">Private</option>
+            <option value="FRIENDS_ONLY">Friends Only</option>
+            <option value="PUBLIC">Public</option>
+          </select>
+        </div>
+        <div class="create-actions">
+          <button (click)="createList()" [disabled]="!newListName.trim()" class="btn-create">Create</button>
+          <button (click)="showCreateForm = false; newListName = ''; newListDescription = '';" class="btn-cancel-sm">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Empty sidebar -->
+      <div *ngIf="lists.length === 0 && !showCreateForm" class="sidebar-empty">
+        No lists yet. Create one above!
+      </div>
+
+      <!-- List items -->
+      <ul class="lists-nav">
+        <li *ngFor="let list of lists"
+          (click)="selectList(list)"
+          [class.active]="selectedList?.id === list.id">
+
+          <div class="list-nav-top">
+            <span class="list-nav-name">{{ list.name }}</span>
+            <span class="vis-chip" [class]="'vis-' + list.visibility.toLowerCase()">
+              {{ list.visibility === 'FRIENDS_ONLY' ? 'Friends' : (list.visibility | titlecase) }}
+            </span>
+          </div>
+
+          <div class="list-nav-sub">{{ list.readCount }} / {{ list.itemCount }} read</div>
+
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width]="getProgressPercent(list) + '%'"></div>
+          </div>
+
+          <button (click)="$event.stopPropagation(); deleteList(list)" class="list-delete" title="Delete list">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+
+        </li>
+      </ul>
+
+    </aside>
+
+    <!-- ── Main panel ── -->
+    <main class="list-detail">
+
+      <!-- Nothing selected -->
+      <div *ngIf="!selectedList" class="detail-placeholder">
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <p>Select a list to view its books</p>
+      </div>
+
+      <!-- Selected list -->
+      <ng-container *ngIf="selectedList">
+
+        <!-- Detail header -->
+        <div class="detail-header">
+          <div>
+            <h2 class="detail-title">{{ selectedList.name }}</h2>
+            <p *ngIf="selectedList.description" class="detail-desc">{{ selectedList.description }}</p>
+          </div>
+          <div class="detail-meta">
+            <span class="vis-chip" [class]="'vis-' + selectedList.visibility.toLowerCase()">
+              {{ selectedList.visibility === 'FRIENDS_ONLY' ? 'Friends Only' : (selectedList.visibility | titlecase) }}
+            </span>
+            <span class="meta-stat">{{ selectedList.readCount }} / {{ selectedList.itemCount }} read</span>
+            <span class="meta-stat">{{ getProgressPercent(selectedList) }}% complete</span>
+          </div>
+        </div>
+
+        <!-- Items empty -->
+        <div *ngIf="items.length === 0" class="detail-placeholder" style="margin-top:0">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <p>No books in this list yet. Add books from the catalog!</p>
+        </div>
+
+        <!-- Items table -->
+        <div *ngIf="items.length > 0" class="items-table-wrap">
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th>Book</th>
+                <th>Priority</th>
+                <th>Added</th>
+                <th>Status</th>
+                <th class="th-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of items" [class.row-read]="item.read">
+                <td class="td-book">
+                  <div class="book-title-cell">{{ item.bookTitle }}</div>
+                  <div class="book-authors-cell" *ngIf="item.authorNames?.length">{{ item.authorNames.join(', ') }}</div>
+                  <div class="book-notes-cell" *ngIf="item.notes">{{ item.notes }}</div>
+                </td>
+                <td>
+                  <span class="priority-chip" [class]="'p-' + item.priority?.toLowerCase()">{{ item.priority }}</span>
+                </td>
+                <td class="td-date">{{ item.addedDate | date:'MMM d, y' }}</td>
+                <td>
+                  <span *ngIf="item.read" class="read-badge">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                    Read
+                  </span>
+                  <span *ngIf="!item.read" class="unread-label">Not read</span>
+                </td>
+                <td class="td-actions">
+                  <button *ngIf="!item.read" (click)="markItemRead(item)" class="btn-mark-read">Mark read</button>
+                  <span *ngIf="item.read" class="done-chip">Done</span>
+                  <button (click)="removeItem(item)" class="btn-remove">Remove</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </ng-container>
+    </main>
+
+  </div>
+</div>

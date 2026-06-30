@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to City Public Library!</title>
+</head>
+<body style="margin:0;padding:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;background-color:#f4f6f9;color:#333333;">
+  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color:#f4f6f9;">
+    <tr>
+      <td align="center" style="padding:40px 20px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" width="600"
+               style="max-width:600px;background-color:#ffffff;border-radius:8px;
+                      overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+
+          <!-- Header — cheerful green -->
+          <tr>
+            <td style="background-color:#2e7d32;padding:40px 40px 32px;text-align:center;">
+              <p style="margin:0 0 8px;font-size:13px;color:#a5d6a7;
+                        letter-spacing:2px;text-transform:uppercase;">
+                City Public Library
+              </p>
+              <h1 style="margin:0 0 8px;color:#ffffff;font-size:28px;font-weight:700;
+                         line-height:1.3;">
+                Welcome to Your Library!
+              </h1>
+              <p style="margin:0;color:#c8e6c9;font-size:15px;line-height:1.5;">
+                Your membership is confirmed and ready to use.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Greeting -->
+          <tr>
+            <td style="padding:32px 40px 0;">
+              <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#444;">
+                Dear <strong>{{firstName}}</strong>,
+              </p>
+              <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#555;">
+                Thank you for joining City Public Library. We are delighted to have
+                you as a member and look forward to helping you discover your next
+                great read. Your membership is now active — here are your details.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Membership details card -->
+          <tr>
+            <td style="padding:0 40px 32px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%"
+                     style="background-color:#e8f5e9;border-radius:8px;
+                            border:1px solid #c8e6c9;overflow:hidden;">
+                <tr>
+                  <td style="background-color:#2e7d32;padding:14px 20px;">
+                    <p style="margin:0;font-size:12px;font-weight:700;color:#a5d6a7;
+                               letter-spacing:1.5px;text-transform:uppercase;">
+                      Membership Details
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:20px 20px 0;">
+                    <table role="presentation" cellpadding="0" cellspacing="0"
+                           width="100%">
+                      <tr>
+                        <td style="padding:8px 0;border-bottom:1px solid #c8e6c9;">
+                          <span style="font-size:13px;color:#777;
+                                       display:inline-block;width:160px;">
+                            Member Name
+                          </span>
+                          <span style="font-size:13px;font-weight:600;color:#1a1a1a;">
+                            {{firstName}} {{lastName}}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:8px 0;border-bottom:1px solid #c8e6c9;">
+                          <span style="font-size:13px;color:#777;
+                                       display:inline-block;width:160px;">
+                            Membership Number
+                          </span>
+                          <span style="font-size:14px;font-weight:700;color:#2e7d32;">
+                            {{membershipNumber}}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:8px 0;border-bottom:1px solid #c8e6c9;">
+                          <span style="font-size:13px;color:#777;
+                                       display:inline-block;width:160px;">
+                            Membership Tier
+                          </span>
+                          <span style="font-size:13px;font-weight:600;color:#333;">
+                            {{membershipTier}}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:8px 0;">
+                          <span style="font-size:13px;color:#777;
+                                       display:inline-block;width:160px;">
+                            Valid Until
+                          </span>
+                          <span style="font-size:13px;font-weight:600;color:#333;">
+                            {{expiryDate}}
+                          </span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:0 20px 20px;">
+                    <!-- spacer row -->
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- What you can do -->
+          <tr>
+            <td style="padding:0 40px 24px;">
+              <h2 style="margin:0 0 16px;font-size:16px;font-weight:700;color:#2e7d32;">
+                What You Can Do as a Member
+              </h2>
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td style="padding:10px 0;border-bottom:1px solid #eeeeee;">
+                    <span style="display:inline-block;width:28px;height:28px;
+                                 background-color:#e8f5e9;border-radius:50%;
+                                 text-align:center;line-height:28px;
+                                 font-size:14px;color:#2e7d32;
+                                 vertical-align:middle;margin-right:12px;">
+                      &#128218;
+                    </span>
+                    <span style="font-size:14px;color:#444;vertical-align:middle;">
+                      Borrow up to <strong>8 physical books</strong> at a time for
+                      21 days each
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 0;border-bottom:1px solid #eeeeee;">
+                    <span style="display:inline-block;width:28px;height:28px;
+                                 background-color:#e8f5e9;border-radius:50%;
+                                 text-align:center;line-height:28px;
+                                 font-size:14px;color:#2e7d32;
+                                 vertical-align:middle;margin-right:12px;">
+                      &#128205;
+                    </span>
+                    <span style="font-size:14px;color:#444;vertical-align:middle;">
+                      Place <strong>holds</strong> on items that are currently
+                      checked out
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 0;border-bottom:1px solid #eeeeee;">
+                    <span style="display:inline-block;width:28px;height:28px;
+                                 background-color:#e8f5e9;border-radius:50%;
+                                 text-align:center;line-height:28px;
+                                 font-size:14px;color:#2e7d32;
+                                 vertical-align:middle;margin-right:12px;">
+                      &#128187;
+                    </span>
+                    <span style="font-size:14px;color:#444;vertical-align:middle;">
+                      Access our growing <strong>digital library</strong> — ebooks,
+                      audiobooks, and more
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 0;border-bottom:1px solid #eeeeee;">
+                    <span style="display:inline-block;width:28px;height:28px;
+                                 background-color:#e8f5e9;border-radius:50%;
+                                 text-align:center;line-height:28px;
+                                 font-size:14px;color:#2e7d32;
+                                 vertical-align:middle;margin-right:12px;">
+                      &#128101;
+                    </span>
+                    <span style="font-size:14px;color:#444;vertical-align:middle;">
+                      Join <strong>book clubs</strong> and participate in
+                      reading challenges
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 0;">
+                    <span style="display:inline-block;width:28px;height:28px;
+                                 background-color:#e8f5e9;border-radius:50%;
+                                 text-align:center;line-height:28px;
+                                 font-size:14px;color:#2e7d32;
+                                 vertical-align:middle;margin-right:12px;">
+                      &#127881;
+                    </span>
+                    <span style="font-size:14px;color:#444;vertical-align:middle;">
+                      Register for <strong>library events</strong> — author talks,
+                      workshops, and exhibitions
+                    </span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Getting started tips -->
+          <tr>
+            <td style="padding:0 40px 32px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%"
+                     style="background-color:#f4f6f9;border-radius:6px;padding:20px 24px;">
+                <tr>
+                  <td>
+                    <h3 style="margin:0 0 12px;font-size:14px;font-weight:700;
+                                color:#333;text-transform:uppercase;letter-spacing:0.5px;">
+                      Getting Started
+                    </h3>
+                    <p style="margin:0 0 8px;font-size:13px;color:#555;
+                               line-height:1.6;">
+                      <strong>1. Find a book</strong> — Search our catalog online or
+                      visit any of our three branches. Staff are always happy to help.
+                    </p>
+                    <p style="margin:0 0 8px;font-size:13px;color:#555;
+                               line-height:1.6;">
+                      <strong>2. Borrow</strong> — Present your membership number
+                      ({{membershipNumber}}) or library card at the desk, or use
+                      a self-checkout kiosk.
+                    </p>
+                    <p style="margin:0;font-size:13px;color:#555;line-height:1.6;">
+                      <strong>3. Manage online</strong> — Renew loans, check fines,
+                      and manage holds any time through the member portal.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- CTA -->
+          <tr>
+            <td style="padding:0 40px 40px;text-align:center;">
+              <a href="{{libraryUrl}}/my-account"
+                 style="display:inline-block;padding:14px 36px;
+                        background-color:#2e7d32;color:#ffffff;
+                        text-decoration:none;border-radius:6px;
+                        font-size:15px;font-weight:700;">
+                Visit My Account
+              </a>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color:#f4f6f9;padding:24px 40px;
+                       border-top:1px solid #e0e0e0;text-align:center;">
+              <p style="margin:0 0 6px;font-size:13px;color:#888;">
+                <strong>Main Branch</strong> &bull; 123 Main Street, Cityville &bull;
+                (555) 100-0001
+              </p>
+              <p style="margin:0 0 6px;font-size:13px;color:#888;">
+                <strong>North Branch</strong> &bull; 456 Oak Avenue &bull;
+                (555) 100-0002 &nbsp;&bull;&nbsp;
+                <strong>South Branch</strong> &bull; 789 Pine Road &bull;
+                (555) 100-0003
+              </p>
+              <p style="margin:0 0 6px;font-size:13px;">
+                <a href="mailto:main@citylibrary.org"
+                   style="color:#2e7d32;text-decoration:none;">
+                  main@citylibrary.org
+                </a>
+                &nbsp;&bull;&nbsp;
+                <a href="{{libraryUrl}}"
+                   style="color:#2e7d32;text-decoration:none;">
+                  www.citylibrary.org
+                </a>
+              </p>
+              <p style="margin:12px 0 0;font-size:11px;color:#aaa;">
+                You received this email because you registered for a City Public
+                Library membership. &nbsp;
+                <a href="{{unsubscribeUrl}}"
+                   style="color:#aaa;text-decoration:underline;">
+                  Manage email preferences
+                </a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "catalog-ui",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start"],
+      "cwd": "catalog-ui",
+      "port": 4200,
+      "autoPort": false
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+<div class="events-management-container">
+  <div class="page-header">
+    <h2>Events Management</h2>
+    <button (click)="openCreateForm()" class="btn btn-primary">+ New Event</button>
+  </div>
+
+  <div *ngIf="showForm" class="form-panel">
+    <h3>{{ editingEvent ? 'Edit Event' : 'Create Event' }}</h3>
+    <div *ngIf="saveError" class="alert alert-error">{{ saveError }}</div>
+    <form #eventForm="ngForm" (ngSubmit)="saveEvent(eventForm)">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Title <span class="required-mark">*</span></label>
+          <input type="text" [(ngModel)]="formData.title" name="title" required
+            #titleField="ngModel"
+            [class.is-invalid]="titleField.invalid && titleField.touched"
+            class="form-input" />
+          <div *ngIf="titleField.errors?.['required'] && titleField.touched" class="invalid-feedback">
+            Title is required
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select [(ngModel)]="formData.eventType" name="eventType" class="form-input">
+            <option *ngFor="let t of eventTypes" [value]="t">{{ t }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Branch</label>
+          <select [(ngModel)]="formData.branchId" name="branchId" class="form-input">
+            <option *ngFor="let b of branches" [value]="b.id">{{ b.name }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Capacity</label>
+          <input type="number" [(ngModel)]="formData.capacity" name="capacity" class="form-input" />
+        </div>
+        <div class="form-group">
+          <label>Start Date/Time <span class="required-mark">*</span></label>
+          <input type="datetime-local" [(ngModel)]="formData.startDateTime" name="startDateTime" required
+            #startField="ngModel"
+            [class.is-invalid]="startField.invalid && startField.touched"
+            class="form-input" />
+          <div *ngIf="startField.errors?.['required'] && startField.touched" class="invalid-feedback">
+            Start date/time is required
+          </div>
+        </div>
+        <div class="form-group">
+          <label>End Date/Time <span class="required-mark">*</span></label>
+          <input type="datetime-local" [(ngModel)]="formData.endDateTime" name="endDateTime" required
+            #endField="ngModel"
+            [class.is-invalid]="endField.invalid && endField.touched"
+            class="form-input" />
+          <div *ngIf="endField.errors?.['required'] && endField.touched" class="invalid-feedback">
+            End date/time is required
+          </div>
+        </div>
+        <div class="form-group form-group-full">
+          <label>Description</label>
+          <textarea [(ngModel)]="formData.description" name="description" rows="3" class="form-input"></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" [disabled]="saving" class="btn btn-primary">{{ saving ? 'Saving...' : 'Save' }}</button>
+        <button type="button" (click)="cancelForm()" class="btn btn-secondary">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <div *ngIf="loading" class="loading-spinner"><div class="spinner"></div></div>
+
+  <table *ngIf="!loading && events.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Type</th>
+        <th>Branch</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Attendees</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let event of events">
+        <td>{{ event.title }}</td>
+        <td>{{ event.type }}</td>
+        <td>{{ event.branchName }}</td>
+        <td>{{ event.startDate | date:'short' }}</td>
+        <td>{{ event.endDate | date:'short' }}</td>
+        <td>{{ event.currentAttendees }}/{{ event.maxAttendees }}</td>
+        <td>
+          <button (click)="openEditForm(event)" class="btn btn-sm btn-secondary">Edit</button>
+          <button (click)="deleteEvent(event.id)" class="btn btn-sm btn-danger">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

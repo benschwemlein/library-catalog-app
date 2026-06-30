@@ -1,0 +1,71 @@
+<div class="event-detail-page">
+  <a routerLink="/events" class="back-link">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    All Events
+  </a>
+  <div *ngIf="loading" class="loading-spinner"><div class="spinner"></div></div>
+  <div *ngIf="!loading && event" class="event-content animate-in">
+    <div class="event-hero" [style.backgroundImage]="event.imageUrl ? 'url(' + event.imageUrl + ')' : ''">
+      <div class="event-hero-overlay"></div>
+      <div class="event-hero-body">
+        <span class="event-type-chip">{{ event.type }}</span>
+        <h1 class="event-hero-title">{{ event.title }}</h1>
+      </div>
+    </div>
+    <div class="event-layout">
+      <div class="event-main">
+        <div *ngIf="event.description" class="event-desc-card">
+          <h2 class="event-section-title">About This Event</h2>
+          <p>{{ event.description }}</p>
+        </div>
+        <div class="event-reg-card" *ngIf="event.registrationRequired">
+          <div *ngIf="actionSuccess" class="reg-success">{{ actionSuccess }}</div>
+          <div *ngIf="actionError" class="reg-error">{{ actionError }}</div>
+          <div *ngIf="!isRegistered">
+            <button (click)="registerForEvent()" [disabled]="registering || event.spotsAvailable === 0" class="btn btn-primary btn-reg">
+              {{ registering ? 'Registering...' : event.spotsAvailable === 0 ? 'Fully Booked' : 'Register for This Event' }}
+            </button>
+            <p *ngIf="event.registrationDeadline" class="deadline-note">Registration closes {{ event.registrationDeadline | date:'mediumDate' }}</p>
+          </div>
+          <div *ngIf="isRegistered" class="registered-state">
+            <div class="registered-badge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              You are registered for this event
+            </div>
+            <button (click)="cancelRegistration()" [disabled]="cancelling" class="btn btn-secondary">{{ cancelling ? 'Cancelling...' : 'Cancel Registration' }}</button>
+          </div>
+        </div>
+        <div class="event-no-reg-card" *ngIf="!event.registrationRequired">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          No registration required — just show up!
+        </div>
+      </div>
+      <aside class="event-sidebar">
+        <div class="event-info-card">
+          <div class="event-info-row">
+            <div class="info-icon-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+            <div><div class="info-label">Date &amp; Time</div><div class="info-value">{{ event.startDate | date:'fullDate' }}</div><div class="info-sub">{{ event.startDate | date:'shortTime' }} – {{ event.endDate | date:'shortTime' }} ({{ getDuration() }})</div></div>
+          </div>
+          <div class="event-info-row">
+            <div class="info-icon-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+            <div><div class="info-label">Location</div><div class="info-value">{{ event.branchName }}</div></div>
+          </div>
+          <div class="event-info-row" *ngIf="event.hostName">
+            <div class="info-icon-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+            <div><div class="info-label">Hosted by</div><div class="info-value">{{ event.hostName }}</div></div>
+          </div>
+          <div class="event-info-row">
+            <div class="info-icon-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+            <div>
+              <div class="info-label">Attendees</div>
+              <div class="info-value">{{ event.currentAttendees }} / {{ event.maxAttendees }}</div>
+              <div class="info-sub" [class.spots-ok]="event.spotsAvailable > 5" [class.spots-few]="event.spotsAvailable <= 5 && event.spotsAvailable > 0" [class.spots-full]="event.spotsAvailable === 0">
+                {{ event.spotsAvailable > 0 ? event.spotsAvailable + ' spots left' : 'Fully booked' }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>

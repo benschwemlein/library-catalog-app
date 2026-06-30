@@ -1,0 +1,26 @@
+<div class="arrivals-page">
+  <div class="page-header"><h1>New Arrivals</h1><p>Books added in the last 30 days</p></div>
+  <div *ngIf="loading" class="loading-spinner"><div class="spinner"></div></div>
+  <div *ngIf="error" class="error-banner">{{ error }}</div>
+  <div *ngIf="!loading && books.length === 0 && !error" class="empty-state">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    <p>No new arrivals in the last 30 days.</p>
+  </div>
+  <div *ngIf="!loading && books.length > 0" class="arrivals-grid">
+    <div *ngFor="let book of books" class="arrival-card" [routerLink]="['/books', book.id]">
+      <div class="arrival-cover">
+        <img *ngIf="book.coverImageUrl" [src]="book.coverImageUrl" [alt]="book.title" />
+        <div *ngIf="!book.coverImageUrl" class="arrival-cover-ph">{{ book.title[0] }}</div>
+        <span class="new-badge">NEW</span>
+        <span class="avail-overlay" [class.avail-ok]="book.availableCopies > 0" [class.avail-none]="book.availableCopies === 0">
+          {{ book.availableCopies > 0 ? book.availableCopies + ' avail.' : 'On hold' }}
+        </span>
+      </div>
+      <div class="arrival-info">
+        <p class="arrival-title">{{ book.title }}</p>
+        <p class="arrival-author">{{ book.authorNames.join(', ') }}</p>
+        <p class="arrival-pub">{{ book.publisherName }}</p>
+      </div>
+    </div>
+  </div>
+</div>

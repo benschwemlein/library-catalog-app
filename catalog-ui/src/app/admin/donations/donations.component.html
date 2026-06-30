@@ -1,0 +1,192 @@
+<div style="padding: 24px; font-family: sans-serif; background: #f8fafc; min-height: 100vh;">
+
+  <h1 style="margin: 0 0 24px; font-size: 1.75rem; font-weight: 700; color: #1e293b;">Donation Management</h1>
+
+  <!-- Stats Cards -->
+  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;">
+    <div style="background: #fff; border-radius: 10px; padding: 20px; border-left: 4px solid #6b7280; box-shadow: 0 1px 4px rgba(0,0,0,.07);">
+      <div style="font-size: 2rem; font-weight: 700; color: #1e293b;">{{ stats.total }}</div>
+      <div style="color: #64748b; font-size: .875rem; margin-top: 4px;">Total Donations</div>
+    </div>
+    <div style="background: #fef3c7; border-radius: 10px; padding: 20px; border-left: 4px solid #f59e0b; box-shadow: 0 1px 4px rgba(0,0,0,.07);">
+      <div style="font-size: 2rem; font-weight: 700; color: #92400e;">{{ stats.pending }}</div>
+      <div style="color: #92400e; font-size: .875rem; margin-top: 4px;">Pending Review</div>
+    </div>
+    <div style="background: #dcfce7; border-radius: 10px; padding: 20px; border-left: 4px solid #22c55e; box-shadow: 0 1px 4px rgba(0,0,0,.07);">
+      <div style="font-size: 2rem; font-weight: 700; color: #166534;">{{ stats.accepted }}</div>
+      <div style="color: #166534; font-size: .875rem; margin-top: 4px;">Accepted</div>
+    </div>
+    <div style="background: #fee2e2; border-radius: 10px; padding: 20px; border-left: 4px solid #ef4444; box-shadow: 0 1px 4px rgba(0,0,0,.07);">
+      <div style="font-size: 2rem; font-weight: 700; color: #991b1b;">{{ stats.declined }}</div>
+      <div style="color: #991b1b; font-size: .875rem; margin-top: 4px;">Declined</div>
+    </div>
+  </div>
+
+  <!-- Error / Success Banners -->
+  <div *ngIf="error" style="background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;">
+    {{ error }}
+  </div>
+  <div *ngIf="successMessage" style="background: #dcfce7; color: #166534; border: 1px solid #86efac; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;">
+    {{ successMessage }}
+  </div>
+
+  <!-- Filter Row -->
+  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+    <label style="font-weight: 600; color: #374151;">Filter by status:</label>
+    <select [(ngModel)]="statusFilter" style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: .875rem; background: #fff;">
+      <option value="">All</option>
+      <option value="PENDING">Pending</option>
+      <option value="ACCEPTED">Accepted</option>
+      <option value="PARTIALLY_ACCEPTED">Partially Accepted</option>
+      <option value="DECLINED">Declined</option>
+    </select>
+    <button (click)="applyFilter()" style="padding: 8px 18px; background: #3b82f6; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: .875rem; font-weight: 600;">
+      Filter
+    </button>
+    <span *ngIf="loading" style="color: #6b7280; font-size: .875rem;">Loading...</span>
+  </div>
+
+  <!-- Two-Column Layout -->
+  <div style="display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start;">
+
+    <!-- Left: Donations List -->
+    <div style="background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.07); overflow: hidden;">
+      <div style="padding: 14px 16px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; font-weight: 700; color: #374151;">
+        Donations ({{ donations.length }})
+      </div>
+      <div style="max-height: 65vh; overflow-y: auto;">
+        <div *ngFor="let d of donations"
+             (click)="selectDonation(d)"
+             [style.background]="selectedDonation?.id === d.id ? '#eff6ff' : '#fff'"
+             [style.border-left]="selectedDonation?.id === d.id ? '4px solid #3b82f6' : '4px solid transparent'"
+             style="padding: 14px 16px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: background .15s;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-weight: 600; color: #1e293b; font-size: .9rem;">{{ d.donorName }}</span>
+            <span [style.background]="getStatusBg(d.status)"
+                  [style.color]="getStatusColor(d.status)"
+                  style="font-size: .7rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; text-transform: uppercase;">
+              {{ d.status }}
+            </span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: #64748b; font-size: .8rem;">{{ formatDate(d.donationDate) }}</span>
+            <span style="background: #e0e7ff; color: #3730a3; font-size: .75rem; font-weight: 600; padding: 2px 8px; border-radius: 999px;">
+              {{ d.items?.length || 0 }} item(s)
+            </span>
+          </div>
+        </div>
+        <div *ngIf="donations.length === 0 && !loading"
+             style="padding: 32px 16px; text-align: center; color: #94a3b8; font-size: .875rem;">
+          No donations found.
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Detail Panel -->
+    <div>
+      <!-- Placeholder -->
+      <div *ngIf="!selectedDonation"
+           style="background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.07); padding: 60px 32px; text-align: center;">
+        <div style="font-size: 2.5rem; margin-bottom: 12px;">📬</div>
+        <div style="color: #94a3b8; font-size: 1rem;">Select a donation to review</div>
+      </div>
+
+      <!-- Detail Content -->
+      <div *ngIf="selectedDonation"
+           style="background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.07); padding: 24px;">
+
+        <!-- Status Badge -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+          <h2 style="margin: 0; font-size: 1.2rem; color: #1e293b;">Donation Detail</h2>
+          <span [style.background]="getStatusBg(selectedDonation.status)"
+                [style.color]="getStatusColor(selectedDonation.status)"
+                style="font-size: .85rem; font-weight: 700; padding: 5px 14px; border-radius: 999px; text-transform: uppercase; letter-spacing: .05em;">
+            {{ selectedDonation.status }}
+          </span>
+        </div>
+
+        <!-- Donor Info -->
+        <div style="background: #f8fafc; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+          <div style="font-weight: 700; color: #374151; margin-bottom: 10px; font-size: .875rem; text-transform: uppercase; letter-spacing: .05em;">Donor Information</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: .875rem;">
+            <div><span style="color: #64748b;">Name:</span> <strong>{{ selectedDonation.donorName }}</strong></div>
+            <div><span style="color: #64748b;">Email:</span> {{ selectedDonation.donorEmail }}</div>
+            <div *ngIf="selectedDonation.donorPhone"><span style="color: #64748b;">Phone:</span> {{ selectedDonation.donorPhone }}</div>
+            <div><span style="color: #64748b;">Date:</span> {{ formatDate(selectedDonation.donationDate) }}</div>
+            <div *ngIf="selectedDonation.targetBranchName"><span style="color: #64748b;">Branch:</span> {{ selectedDonation.targetBranchName }}</div>
+          </div>
+        </div>
+
+        <!-- Items Table -->
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: 700; color: #374151; margin-bottom: 10px; font-size: .875rem; text-transform: uppercase; letter-spacing: .05em;">Donated Items</div>
+          <table style="width: 100%; border-collapse: collapse; font-size: .85rem;">
+            <thead>
+              <tr style="background: #f1f5f9;">
+                <th style="padding: 8px 10px; text-align: left; color: #64748b; font-weight: 600; border-bottom: 1px solid #e2e8f0;">Title</th>
+                <th style="padding: 8px 10px; text-align: left; color: #64748b; font-weight: 600; border-bottom: 1px solid #e2e8f0;">Author</th>
+                <th style="padding: 8px 10px; text-align: left; color: #64748b; font-weight: 600; border-bottom: 1px solid #e2e8f0;">Condition</th>
+                <th style="padding: 8px 10px; text-align: center; color: #64748b; font-weight: 600; border-bottom: 1px solid #e2e8f0;">Qty</th>
+                <th style="padding: 8px 10px; text-align: left; color: #64748b; font-weight: 600; border-bottom: 1px solid #e2e8f0;">Disposition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of selectedDonation.items" style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 8px 10px; color: #1e293b;">{{ item.title }}</td>
+                <td style="padding: 8px 10px; color: #475569;">{{ item.author }}</td>
+                <td style="padding: 8px 10px; color: #475569;">{{ item.condition }}</td>
+                <td style="padding: 8px 10px; text-align: center; color: #475569;">{{ item.quantity }}</td>
+                <td style="padding: 8px 10px; color: #475569;">{{ item.disposition || '--' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Review Section -->
+        <div style="background: #f8fafc; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+          <div style="font-weight: 700; color: #374151; margin-bottom: 12px; font-size: .875rem; text-transform: uppercase; letter-spacing: .05em;">Review Decision</div>
+          <div style="margin-bottom: 10px;">
+            <label style="display: block; font-size: .8rem; color: #64748b; margin-bottom: 4px;">Reviewer Name</label>
+            <input [(ngModel)]="reviewForm.reviewerName"
+                   placeholder="Your name"
+                   style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: .875rem; box-sizing: border-box;" />
+          </div>
+          <div style="margin-bottom: 14px;">
+            <label style="display: block; font-size: .8rem; color: #64748b; margin-bottom: 4px;">Notes</label>
+            <textarea [(ngModel)]="reviewForm.notes"
+                      rows="3"
+                      placeholder="Add any review notes..."
+                      style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: .875rem; resize: vertical; box-sizing: border-box;"></textarea>
+          </div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button (click)="reviewDonation('ACCEPTED')"
+                    style="padding: 9px 20px; background: #22c55e; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: .875rem;">
+              Accept
+            </button>
+            <button (click)="reviewDonation('PARTIALLY_ACCEPTED')"
+                    style="padding: 9px 20px; background: #3b82f6; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: .875rem;">
+              Partially Accept
+            </button>
+            <button (click)="reviewDonation('DECLINED')"
+                    style="padding: 9px 20px; background: #ef4444; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: .875rem;">
+              Decline
+            </button>
+          </div>
+        </div>
+
+        <!-- Acknowledgement Button -->
+        <div>
+          <button (click)="sendAcknowledgement(selectedDonation)"
+                  [disabled]="selectedDonation.acknowledgementSent"
+                  [style.opacity]="selectedDonation.acknowledgementSent ? '0.5' : '1'"
+                  [style.cursor]="selectedDonation.acknowledgementSent ? 'not-allowed' : 'pointer'"
+                  style="padding: 9px 20px; background: #8b5cf6; color: #fff; border: none; border-radius: 6px; font-weight: 600; font-size: .875rem;">
+            {{ selectedDonation.acknowledgementSent ? 'Acknowledgement Sent' : 'Send Acknowledgement' }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

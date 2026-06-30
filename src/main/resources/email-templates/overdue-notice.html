@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overdue Library Item — Action Required</title>
+</head>
+<body style="margin:0;padding:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;background-color:#f4f6f9;color:#333333;">
+  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color:#f4f6f9;">
+    <tr>
+      <td align="center" style="padding:40px 20px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" width="600"
+               style="max-width:600px;background-color:#ffffff;border-radius:8px;
+                      overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+
+          <!-- Header — urgent red/orange tone -->
+          <tr>
+            <td style="background-color:#c62828;padding:32px 40px;text-align:center;">
+              <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:700;
+                         letter-spacing:-0.5px;">
+                City Public Library
+              </h1>
+              <p style="margin:8px 0 0;color:#ffcdd2;font-size:13px;
+                        text-transform:uppercase;letter-spacing:1.5px;">
+                Overdue Notice — Action Required
+              </p>
+            </td>
+          </tr>
+
+          <!-- Urgency banner -->
+          <tr>
+            <td style="background-color:#fff3e0;padding:20px 40px;
+                       border-bottom:1px solid #ffe0b2;border-left:4px solid #e65100;">
+              <p style="margin:0;font-size:15px;font-weight:600;color:#e65100;">
+                &#9888; You have an overdue library item.
+              </p>
+              <p style="margin:6px 0 0;font-size:13px;color:#777;">
+                Please return this item as soon as possible to stop further fines
+                from accruing.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:32px 40px;">
+              <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#444;">
+                Dear <strong>{{memberName}}</strong>,
+              </p>
+              <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#444;">
+                Our records show that the following item is overdue. A daily fine is
+                being applied to your account until the item is returned. To stop the
+                fine from growing, please return the item to any City Public Library
+                branch today.
+              </p>
+
+              <!-- Loan details box -->
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%"
+                     style="background-color:#fff8f8;border-radius:6px;
+                            border:1px solid #ffcdd2;margin-bottom:24px;">
+                <tr>
+                  <td style="padding:20px 24px;">
+                    <h2 style="margin:0 0 4px;font-size:18px;color:#1a1a1a;">
+                      {{bookTitle}}
+                    </h2>
+                    <p style="margin:0 0 16px;font-size:13px;color:#777;">
+                      by {{authorName}}
+                    </p>
+                    <table role="presentation" cellpadding="0" cellspacing="0"
+                           width="100%">
+                      <tr>
+                        <td style="padding:8px 0;border-top:1px solid #ffcdd2;">
+                          <span style="font-size:13px;color:#888;
+                                       display:inline-block;width:160px;">
+                            Checked Out
+                          </span>
+                          <span style="font-size:13px;font-weight:600;color:#333;">
+                            {{checkoutDate}}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:8px 0;border-top:1px solid #ffcdd2;">
+                          <span style="font-size:13px;color:#888;
+                                       display:inline-block;width:160px;">
+                            Due Date
+                          </span>
+                          <span style="font-size:13px;font-weight:600;color:#c62828;">
+                            {{dueDate}}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:8px 0;border-top:1px solid #ffcdd2;">
+                          <span style="font-size:13px;color:#888;
+                                       display:inline-block;width:160px;">
+                            Days Overdue
+                          </span>
+                          <span style="font-size:13px;font-weight:700;color:#c62828;">
+                            {{daysOverdue}} day(s)
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:8px 0;border-top:1px solid #ffcdd2;">
+                          <span style="font-size:13px;color:#888;
+                                       display:inline-block;width:160px;">
+                            Fine to Date
+                          </span>
+                          <span style="font-size:13px;font-weight:700;color:#c62828;">
+                            ${{fineAmount}}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:8px 0;border-top:1px solid #ffcdd2;">
+                          <span style="font-size:13px;color:#888;
+                                       display:inline-block;width:160px;">
+                            Barcode
+                          </span>
+                          <span style="font-size:13px;font-weight:600;color:#333;">
+                            {{copyBarcode}}
+                          </span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Return instructions -->
+              <h3 style="margin:0 0 12px;font-size:15px;color:#333;">
+                How to Return
+              </h3>
+              <ul style="margin:0 0 24px;padding-left:20px;
+                         font-size:14px;color:#555;line-height:1.8;">
+                <li>Return the item to any City Public Library branch during
+                    opening hours.</li>
+                <li>Use the after-hours drop box at the Main Branch (123 Main
+                    Street) at any time.</li>
+                <li>Fines must be paid before your next checkout. You may pay at
+                    any branch desk or through the member portal.</li>
+              </ul>
+
+              <!-- Renew CTA (if eligible) -->
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%"
+                     style="background-color:#f4f6f9;border-radius:6px;
+                            padding:16px 20px;margin-bottom:24px;">
+                <tr>
+                  <td>
+                    <p style="margin:0 0 8px;font-size:13px;color:#555;">
+                      <strong>Can you still renew?</strong> If you need more time and
+                      this item is not already on hold for another patron, you may
+                      be able to renew online.
+                    </p>
+                    <a href="{{libraryUrl}}/my-loans"
+                       style="display:inline-block;padding:10px 24px;
+                              background-color:#1a73e8;color:#ffffff;
+                              text-decoration:none;border-radius:5px;
+                              font-size:13px;font-weight:600;">
+                      Renew Online
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color:#f4f6f9;padding:24px 40px;
+                       border-top:1px solid #e0e0e0;text-align:center;">
+              <p style="margin:0 0 8px;font-size:12px;color:#888;">
+                City Public Library &bull; 123 Main Street, Cityville &bull;
+                (555) 100-0001
+              </p>
+              <p style="margin:0 0 8px;font-size:12px;color:#888;">
+                <a href="mailto:main@citylibrary.org"
+                   style="color:#1a73e8;text-decoration:none;">
+                  main@citylibrary.org
+                </a>
+                &nbsp;&bull;&nbsp;
+                <a href="{{libraryUrl}}"
+                   style="color:#1a73e8;text-decoration:none;">
+                  www.citylibrary.org
+                </a>
+              </p>
+              <p style="margin:0;font-size:11px;color:#aaa;">
+                You received this notice because you have an overdue item on your
+                library account. &nbsp;
+                <a href="{{unsubscribeUrl}}"
+                   style="color:#aaa;text-decoration:underline;">
+                  Manage email preferences
+                </a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

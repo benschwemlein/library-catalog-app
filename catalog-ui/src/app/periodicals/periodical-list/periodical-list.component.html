@@ -1,0 +1,181 @@
+<div style="padding: 24px; font-family: sans-serif; max-width: 1400px; margin: 0 auto;">
+
+  <!-- Page Title -->
+  <h1 style="font-size: 1.75rem; font-weight: 700; color: #1e293b; margin: 0 0 24px 0;">Periodicals Catalog</h1>
+
+  <!-- Search Bar Row -->
+  <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 24px; flex-wrap: wrap;">
+    <input
+      type="text"
+      [(ngModel)]="searchQuery"
+      placeholder="Search by title, publisher, or ISSN..."
+      (keyup.enter)="search()"
+      style="flex: 1; min-width: 200px; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; outline: none;"
+    />
+    <select
+      [(ngModel)]="selectedCategory"
+      style="padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; background: white; min-width: 160px; outline: none;"
+    >
+      <option value="">All Categories</option>
+      <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+    </select>
+    <button
+      (click)="search()"
+      style="padding: 10px 22px; background: #3b82f6; color: white; border: none; border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer;"
+    >
+      Search
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" style="text-align: center; padding: 48px; color: #64748b; font-size: 1rem;">
+    Loading periodicals...
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" style="background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 6px; padding: 14px 18px; margin-bottom: 20px;">
+    {{ error }}
+  </div>
+
+  <!-- Two-Panel Layout -->
+  <div *ngIf="!loading" style="display: flex; gap: 20px; align-items: flex-start;">
+
+    <!-- Left Panel: Periodical List -->
+    <div style="flex: 1; min-width: 0;">
+
+      <!-- Empty State -->
+      <div
+        *ngIf="periodicals.length === 0 && !error"
+        style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 48px; text-align: center; color: #64748b;"
+      >
+        <div style="font-size: 2rem; margin-bottom: 12px;">📰</div>
+        <div style="font-size: 1rem; font-weight: 500;">No periodicals found</div>
+        <div style="font-size: 0.875rem; margin-top: 4px;">Try adjusting your search or category filter.</div>
+      </div>
+
+      <!-- Periodical Cards -->
+      <div *ngFor="let p of periodicals">
+        <div
+          (click)="selectPeriodical(p)"
+          style="background: white; border-radius: 8px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; transition: box-shadow 0.15s;"
+          [style.border]="selectedPeriodical?.id === p.id ? '2px solid #3b82f6' : '1px solid #e2e8f0'"
+          [style.box-shadow]="selectedPeriodical?.id === p.id ? '0 0 0 3px #dbeafe' : '0 1px 3px rgba(0,0,0,0.06)'"
+          [style.background]="selectedPeriodical?.id === p.id ? '#f0f7ff' : 'white'"
+        >
+          <!-- Title Row -->
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 8px;">
+            <div>
+              <span style="font-size: 1rem; font-weight: 600; color: #1e293b;">{{ p.title }}</span>
+              <span *ngIf="p.issn" style="font-size: 0.78rem; color: #64748b; margin-left: 10px;">ISSN: {{ p.issn }}</span>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
+              <!-- Digital Access Icon -->
+              <span
+                *ngIf="p.digitalAccess"
+                title="Digital Access Available"
+                style="display: inline-flex; align-items: center; gap: 4px; background: #dbeafe; color: #1d4ed8; font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 12px;"
+              >
+                &#x1F310; Digital
+              </span>
+              <!-- Active badge -->
+              <span
+                [style.background]="p.active ? '#dcfce7' : '#fee2e2'"
+                [style.color]="p.active ? '#166534' : '#991b1b'"
+                style="font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 12px;"
+              >{{ p.active ? 'Active' : 'Inactive' }}</span>
+            </div>
+          </div>
+
+          <!-- Meta Row -->
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font-size: 0.82rem; color: #475569;">
+            <span *ngIf="p.publisher">
+              <span style="font-weight: 500;">Publisher:</span> {{ p.publisher }}
+            </span>
+            <!-- Frequency Badge -->
+            <span
+              style="background: #f1f5f9; color: #334155; font-weight: 600; padding: 2px 9px; border-radius: 10px; font-size: 0.78rem;"
+            >{{ getFrequencyLabel(p.frequency) }}</span>
+            <!-- Category -->
+            <span *ngIf="p.category"
+              style="background: #ede9fe; color: #5b21b6; font-weight: 500; padding: 2px 9px; border-radius: 10px; font-size: 0.78rem;"
+            >{{ p.category }}</span>
+            <!-- Branch -->
+            <span *ngIf="p.branchName" style="color: #64748b;">
+              &#x1F3DB; {{ p.branchName }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel: Issues -->
+    <div style="width: 480px; flex-shrink: 0; position: sticky; top: 24px;">
+      <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; min-height: 300px; overflow: hidden;">
+
+        <!-- No selection placeholder -->
+        <div
+          *ngIf="!selectedPeriodical"
+          style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 24px; color: #94a3b8; text-align: center;"
+        >
+          <div style="font-size: 2.5rem; margin-bottom: 14px;">📋</div>
+          <div style="font-size: 0.95rem; font-weight: 500;">Select a periodical to view issues</div>
+          <div style="font-size: 0.82rem; margin-top: 4px;">Click any card on the left to load its issues.</div>
+        </div>
+
+        <!-- Issues Panel Content -->
+        <div *ngIf="selectedPeriodical">
+          <!-- Issues Panel Header -->
+          <div style="padding: 16px 18px; border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
+            <div style="font-size: 1rem; font-weight: 700; color: #1e293b;">{{ selectedPeriodical.title }}</div>
+            <div style="font-size: 0.82rem; color: #64748b; margin-top: 2px;">Issues</div>
+          </div>
+
+          <!-- Issues Empty State -->
+          <div
+            *ngIf="issues.length === 0"
+            style="padding: 40px 24px; text-align: center; color: #94a3b8; font-size: 0.9rem;"
+          >
+            No issues found for this periodical.
+          </div>
+
+          <!-- Issues Table -->
+          <div *ngIf="issues.length > 0" style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+              <thead>
+                <tr style="background: #f1f5f9; text-align: left;">
+                  <th style="padding: 10px 12px; font-weight: 600; color: #475569; white-space: nowrap;">Vol / Issue</th>
+                  <th style="padding: 10px 12px; font-weight: 600; color: #475569;">Pub Date</th>
+                  <th style="padding: 10px 12px; font-weight: 600; color: #475569;">Status</th>
+                  <th style="padding: 10px 12px; font-weight: 600; color: #475569;">Location</th>
+                  <th style="padding: 10px 12px; font-weight: 600; color: #475569;">Condition</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let issue of issues; let i = index"
+                  [style.background]="i % 2 === 0 ? 'white' : '#f8fafc'"
+                >
+                  <td style="padding: 9px 12px; color: #334155; white-space: nowrap; font-weight: 500;">
+                    Vol {{ issue.volume }}, #{{ issue.issueNumber }}
+                  </td>
+                  <td style="padding: 9px 12px; color: #475569; white-space: nowrap;">{{ issue.publicationDate }}</td>
+                  <td style="padding: 9px 12px;">
+                    <span
+                      [style.background]="getIssueStatusColor(issue.status) + '22'"
+                      [style.color]="getIssueStatusColor(issue.status)"
+                      style="font-weight: 600; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; white-space: nowrap;"
+                    >{{ issue.status }}</span>
+                  </td>
+                  <td style="padding: 9px 12px; color: #475569;">{{ issue.location || '—' }}</td>
+                  <td style="padding: 9px 12px; color: #475569;">{{ issue.condition || '—' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

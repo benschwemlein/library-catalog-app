@@ -1,0 +1,32 @@
+<div class="toast-container-wrapper" aria-live="polite" aria-atomic="false">
+  <div
+    *ngFor="let toast of toasts$ | async; trackBy: trackById"
+    class="alert d-flex align-items-start shadow-sm mb-2 fade show"
+    [ngClass]="alertClass(toast.type)"
+    role="alert"
+  >
+    <i class="bi me-2 flex-shrink-0 mt-1" [ngClass]="iconClass(toast.type)"></i>
+    <div class="flex-grow-1">
+      <strong *ngIf="toast.title" class="d-block">{{ toast.title }}</strong>
+      <span>{{ toast.message }}</span>
+    </div>
+    <button
+      *ngIf="toast.dismissible"
+      type="button"
+      class="btn-close ms-2 flex-shrink-0"
+      aria-label="Close"
+      (click)="dismiss(toast.id)"
+    ></button>
+  </div>
+</div>
+
+<style>
+  .toast-container-wrapper {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10000;
+    min-width: 300px;
+    max-width: 420px;
+  }
+</style>

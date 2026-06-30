@@ -1,0 +1,103 @@
+spring:
+  application:
+    name: library-catalog
+  profiles:
+    active: dev
+  datasource:
+    url: jdbc:h2:mem:librarydb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+        globally_quoted_identifiers: true
+  liquibase:
+    enabled: false
+    change-log: classpath:db/changelog/db.changelog-master.xml
+  flyway:
+    enabled: false
+  security:
+    user:
+      name: admin
+      password: password
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:library@example.com}
+    password: ${MAIL_PASSWORD:changeme}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  task:
+    execution:
+      pool:
+        core-size: 5
+        max-size: 20
+        queue-capacity: 100
+        keep-alive: 60s
+      thread-name-prefix: library-async-
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+application:
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+      expiration: 86400000
+      refresh-token:
+        expiration: 604800000
+  library:
+    max-loans-per-member: 8
+    default-loan-period-days: 21
+    overdue-fine-grace-period-days: 1
+    max-renewals: 3
+    hold-expiry-days: 7
+    recommendation-cache-ttl-minutes: 30
+    unpaid-fines-threshold: "10.00"
+    search-index-stale-days: 7
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers,caches
+  endpoint:
+    health:
+      show-details: when-authorized
+    caches:
+      enabled: true
+
+logging:
+  level:
+    com.example.library: DEBUG
+    com.example.catalog: INFO
+    org.springframework.security: INFO
+    org.hibernate.SQL: WARN
+    org.springframework.scheduling: INFO
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
+
+scheduling:
+  enabled: true

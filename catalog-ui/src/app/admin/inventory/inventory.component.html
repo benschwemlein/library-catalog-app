@@ -1,0 +1,63 @@
+<div class="inventory-container">
+  <h2>Inventory Management</h2>
+
+  <div class="filters">
+    <div class="form-group">
+      <label>Branch</label>
+      <select [(ngModel)]="selectedBranchId" (ngModelChange)="loadCopies()" class="form-input">
+        <option *ngFor="let branch of branches" [value]="branch.id">{{ branch.name }}</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Status</label>
+      <select [(ngModel)]="statusFilter" class="form-input">
+        <option value="">All Statuses</option>
+        <option value="AVAILABLE">Available</option>
+        <option value="CHECKED_OUT">Checked Out</option>
+        <option value="ON_HOLD">On Hold</option>
+        <option value="IN_REPAIR">In Repair</option>
+        <option value="LOST">Lost</option>
+      </select>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-spinner"><div class="spinner"></div></div>
+
+  <div *ngIf="!loading && filteredCopies.length === 0" class="empty-state">No copies found.</div>
+
+  <table *ngIf="!loading && filteredCopies.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Barcode</th>
+        <th>Book Title</th>
+        <th>ISBN</th>
+        <th>Condition</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let copy of filteredCopies">
+        <td>{{ copy.barcode }}</td>
+        <td>{{ copy.bookTitle }}</td>
+        <td>{{ copy.isbn }}</td>
+        <td>{{ copy.condition }}</td>
+        <td>
+          <span class="badge"
+            [class.badge-success]="copy.status === 'AVAILABLE'"
+            [class.badge-warning]="copy.status === 'CHECKED_OUT'"
+            [class.badge-danger]="copy.status === 'LOST'">
+            {{ copy.status }}
+          </span>
+        </td>
+        <td>
+          <div class="action-buttons">
+            <button (click)="transferCopy(copy.id)" [disabled]="actionLoading[copy.id]" class="btn btn-sm btn-secondary">Transfer</button>
+            <button (click)="withdrawCopy(copy.id)" [disabled]="actionLoading[copy.id]" class="btn btn-sm btn-danger">Withdraw</button>
+          </div>
+          <div *ngIf="actionError[copy.id]" class="action-error">{{ actionError[copy.id] }}</div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

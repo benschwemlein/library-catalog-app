@@ -1,0 +1,140 @@
+<div class="member-dash">
+
+  <div *ngIf="loading" class="loading-spinner"><div class="spinner"></div></div>
+
+  <ng-container *ngIf="!loading && member">
+
+    <!-- Welcome header -->
+    <div class="welcome-banner">
+      <div class="welcome-avatar">{{ member.firstName[0] }}{{ member.lastName[0] }}</div>
+      <div class="welcome-text">
+        <h1>Welcome back, {{ member.firstName }}!</h1>
+        <div class="welcome-meta">
+          <span class="tier-badge">{{ member.membershipTier }}</span>
+          <span class="meta-dot">·</span>
+          <span>Member since {{ member.memberSince | date:'MMMM y' }}</span>
+          <span class="meta-dot">·</span>
+          <span>Expires {{ member.expirationDate | date:'mediumDate' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="stats-row animate-in">
+
+      <div class="stat-card" [class.stat-warn]="overdueLoansCount > 0" [routerLink]="['/member/loans']">
+        <div class="stat-bg-icon">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </div>
+        <div class="stat-value">{{ currentLoans.length }}</div>
+        <div class="stat-label">Active Loans</div>
+        <div class="stat-sub" *ngIf="overdueLoansCount > 0">{{ overdueLoansCount }} overdue</div>
+        <div class="stat-sub ok" *ngIf="overdueLoansCount === 0">All on time</div>
+      </div>
+
+      <div class="stat-card" [routerLink]="['/member/holds']">
+        <div class="stat-bg-icon">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="stat-value">{{ holds.length }}</div>
+        <div class="stat-label">Holds</div>
+        <div class="stat-sub ok" *ngIf="readyHoldsCount > 0">{{ readyHoldsCount }} ready for pickup</div>
+        <div class="stat-sub" *ngIf="readyHoldsCount === 0">None ready</div>
+      </div>
+
+      <div class="stat-card" [class.stat-danger]="totalFinesAmount > 0" [routerLink]="['/member/fines']">
+        <div class="stat-bg-icon">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <div class="stat-value">{{ totalFinesAmount | currency }}</div>
+        <div class="stat-label">Unpaid Fines</div>
+        <div class="stat-sub ok" *ngIf="totalFinesAmount === 0">No outstanding fines</div>
+        <div class="stat-sub" *ngIf="totalFinesAmount > 0">Click to pay</div>
+      </div>
+
+      <div class="stat-card" [routerLink]="['/member/notifications']">
+        <div class="stat-bg-icon">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </div>
+        <div class="stat-value">{{ unreadNotificationCount }}</div>
+        <div class="stat-label">Notifications</div>
+        <div class="stat-sub" *ngIf="unreadNotificationCount > 0">{{ unreadNotificationCount }} unread</div>
+        <div class="stat-sub ok" *ngIf="unreadNotificationCount === 0">All caught up</div>
+      </div>
+
+    </div>
+
+    <!-- Two-column layout -->
+    <div class="dash-columns animate-in" style="animation-delay:0.1s">
+
+      <!-- Current loans table -->
+      <div class="dash-panel">
+        <div class="panel-header">
+          <h2 class="section-title">Current Loans</h2>
+          <a [routerLink]="['/member/loans']" class="panel-link">View all</a>
+        </div>
+
+        <div *ngIf="currentLoans.length === 0" class="empty-state">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <h3>No active loans</h3>
+          <p>Browse the catalog to find your next read.</p>
+        </div>
+
+        <table *ngIf="currentLoans.length > 0" class="data-table">
+          <thead>
+            <tr>
+              <th>Book</th>
+              <th>Due Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let loan of currentLoans | slice:0:5">
+              <td class="loan-title">{{ loan.bookTitle }}</td>
+              <td [class.overdue-date]="loan.status === 'OVERDUE'">{{ loan.dueDate | date:'mediumDate' }}</td>
+              <td>
+                <span class="badge" [class.badge-rose]="loan.status === 'OVERDUE'" [class.badge-emerald]="loan.status === 'ACTIVE'">
+                  {{ loan.status }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Notifications -->
+      <div class="dash-panel">
+        <div class="panel-header">
+          <h2 class="section-title">Notifications</h2>
+          <a [routerLink]="['/member/notifications']" class="panel-link">View all</a>
+        </div>
+
+        <div *ngIf="notifications.length === 0" class="empty-state">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <h3>No notifications</h3>
+          <p>You're all caught up.</p>
+        </div>
+
+        <ul *ngIf="notifications.length > 0" class="notif-list">
+          <li *ngFor="let n of notifications | slice:0:5" [class.unread]="!n.read">
+            <div class="notif-dot" [class.unread-dot]="!n.read"></div>
+            <div class="notif-body">
+              <div class="notif-subject">{{ n.subject }}</div>
+              <div class="notif-msg">{{ n.message }}</div>
+              <div class="notif-time">{{ n.sentAt | date:'shortDate' }}</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+  </ng-container>
+
+  <div *ngIf="!loading && !member" class="empty-state">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <h3>Member profile not found</h3>
+    <p>Your user account may not be linked to a member record.</p>
+  </div>
+
+</div>

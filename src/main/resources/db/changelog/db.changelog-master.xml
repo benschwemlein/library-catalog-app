@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <include file="db/changelog/changes/V001__create_users_and_roles.sql" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/V002__create_catalog_tables.sql" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/V003__create_member_tables.sql" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/V004__create_branch_tables.sql" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/V005__create_inventory_tables.sql" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/V006__create_circulation_tables.sql" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/V007__create_notification_tables.sql" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/V008__create_digital_resource_tables.sql" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/V009__create_community_tables.sql" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/V010__create_challenge_tables.sql" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/V011__create_acquisition_tables.sql" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/V012__create_periodical_tables.sql" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/V013__create_interlibrary_tables.sql" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/V014__create_wishlist_tables.sql" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/V015__create_donation_tables.sql" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/V016__create_audit_tables.sql" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/V017__create_review_tables.sql" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/V018__seed_reference_data.sql" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/V019__add_indexes_and_constraints.sql" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/V020__add_circulation_rules.sql" relativeToChangelogFile="false"/>
+
+</databaseChangeLog>

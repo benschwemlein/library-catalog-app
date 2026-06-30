@@ -1,0 +1,196 @@
+<div style="padding: 24px; max-width: 900px; margin: 0 auto; font-family: system-ui, sans-serif;">
+
+  <a routerLink="/book-clubs"
+    style="display: inline-flex; align-items: center; gap: 6px; color: #7c3aed; font-size: 14px; font-weight: 500; text-decoration: none; margin-bottom: 24px;">
+    ← All Book Clubs
+  </a>
+
+  <!-- Loading club -->
+  <div *ngIf="loadingClub" style="display: flex; align-items: center; gap: 12px; padding: 60px 0; justify-content: center;">
+    <div style="width: 28px; height: 28px; border: 3px solid #e5e7eb; border-top-color: #7c3aed; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+    <span style="color: #6b7280;">Loading club...</span>
+    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+  </div>
+
+  <!-- Club error -->
+  <div *ngIf="clubError && !loadingClub"
+    style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; color: #991b1b; margin-bottom: 20px;">
+    {{ clubError }}
+  </div>
+
+  <!-- Club content -->
+  <div *ngIf="club && !loadingClub">
+
+    <!-- Header -->
+    <div style="background: white; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); overflow: hidden; margin-bottom: 24px;">
+      <div style="background: #7c3aed; padding: 28px 28px 24px; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
+        <div>
+          <div style="font-size: 26px; font-weight: 700; color: white; margin-bottom: 6px;">{{ club.name }}</div>
+          <div style="font-size: 13px; color: rgba(255,255,255,0.75);">{{ club.branchName }}
+            <span *ngIf="club.facilitatorName"> &bull; Led by {{ club.facilitatorName }}</span>
+          </div>
+        </div>
+        <span [style.background]="getStatusColor(club.status)"
+          style="font-size: 11px; font-weight: 700; color: white; padding: 4px 12px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.4px; white-space: nowrap; align-self: flex-start;">
+          {{ getStatusLabel(club.status) }}
+        </span>
+      </div>
+
+      <div style="padding: 24px 28px; display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start;">
+        <!-- Description -->
+        <div style="flex: 1; min-width: 220px;">
+          <p *ngIf="club.description" style="margin: 0 0 16px; font-size: 14px; color: #4b5563; line-height: 1.7;">
+            {{ club.description }}
+          </p>
+
+          <!-- Current book -->
+          <div *ngIf="club.currentBookTitle"
+            style="display: flex; align-items: center; gap: 10px; background: #faf5ff; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px;">
+            <span style="font-size: 20px;">📖</span>
+            <div>
+              <div style="font-size: 11px; color: #7c3aed; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px;">Currently Reading</div>
+              <div style="font-size: 14px; color: #111827; font-weight: 600;">{{ club.currentBookTitle }}</div>
+            </div>
+          </div>
+
+          <!-- Meeting schedule -->
+          <div *ngIf="club.meetingSchedule"
+            style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #6b7280;">
+            <span>📅</span><span>{{ club.meetingSchedule }}</span>
+          </div>
+        </div>
+
+        <!-- Membership panel -->
+        <div style="min-width: 200px; background: #f9fafb; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 12px; color: #6b7280; margin-bottom: 5px;">
+              <span>{{ club.memberCount }} / {{ club.maxMembers }} members</span>
+              <span [style.color]="isClubFull() ? '#dc2626' : '#059669'">
+                {{ isClubFull() ? 'Full' : (club.maxMembers - club.memberCount) + ' open' }}
+              </span>
+            </div>
+            <div style="background: #e5e7eb; border-radius: 4px; height: 6px; overflow: hidden;">
+              <div [style.width]="getMemberFillPercent() + '%'"
+                [style.background]="isClubFull() ? '#dc2626' : '#7c3aed'"
+                style="height: 100%; border-radius: 4px; transition: width 0.3s;"></div>
+            </div>
+          </div>
+
+          <div *ngIf="actionMessage"
+            style="font-size: 13px; color: #059669; background: #ecfdf5; padding: 8px 10px; border-radius: 6px; font-weight: 500;">
+            {{ actionMessage }}
+          </div>
+          <div *ngIf="actionError"
+            style="font-size: 13px; color: #dc2626; background: #fef2f2; padding: 8px 10px; border-radius: 6px;">
+            {{ actionError }}
+          </div>
+
+          <button *ngIf="club.status === 'ACTIVE'"
+            (click)="toggleMembership()"
+            [disabled]="joiningOrLeaving || (!isMember && isClubFull())"
+            [style.background]="isMember ? '#fef2f2' : (isClubFull() ? '#e5e7eb' : '#7c3aed')"
+            [style.color]="isMember ? '#dc2626' : (isClubFull() ? '#9ca3af' : 'white')"
+            [style.border]="isMember ? '1px solid #fecaca' : 'none'"
+            [style.cursor]="joiningOrLeaving || (!isMember && isClubFull()) ? 'not-allowed' : 'pointer'"
+            style="padding: 10px; border-radius: 8px; font-size: 14px; font-weight: 600; width: 100%;">
+            <span *ngIf="joiningOrLeaving">Processing...</span>
+            <span *ngIf="!joiningOrLeaving && isMember">Leave Club</span>
+            <span *ngIf="!joiningOrLeaving && !isMember && !isClubFull()">Join Club</span>
+            <span *ngIf="!joiningOrLeaving && !isMember && isClubFull()">Club Full</span>
+          </button>
+
+          <div *ngIf="club.status !== 'ACTIVE'"
+            style="padding: 10px; text-align: center; background: #f3f4f6; color: #9ca3af; border-radius: 8px; font-size: 13px;">
+            Not accepting new members
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming Meetings -->
+    <div style="background: white; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); padding: 24px 28px; margin-bottom: 24px;">
+      <h2 style="margin: 0 0 18px; font-size: 18px; font-weight: 700; color: #111827;">Upcoming Meetings</h2>
+
+      <div *ngIf="loadingMeetings" style="color: #6b7280; font-size: 14px;">Loading meetings...</div>
+      <div *ngIf="meetingsError && !loadingMeetings" style="color: #dc2626; font-size: 14px;">{{ meetingsError }}</div>
+
+      <div *ngIf="!loadingMeetings && !meetingsError && meetings.length === 0"
+        style="text-align: center; padding: 24px 0; color: #6b7280; font-size: 14px;">
+        No upcoming meetings scheduled.
+      </div>
+
+      <div *ngIf="!loadingMeetings && meetings.length > 0"
+        style="display: flex; flex-direction: column; gap: 12px;">
+        <div *ngFor="let meeting of meetings; trackBy: trackById"
+          style="display: flex; align-items: flex-start; gap: 14px; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px 16px;">
+          <div style="background: #ede9fe; border-radius: 8px; padding: 8px 12px; text-align: center; flex-shrink: 0; min-width: 48px;">
+            <div style="font-size: 18px; font-weight: 700; color: #7c3aed;">
+              {{ meeting.meetingDate | date:'d' }}
+            </div>
+            <div style="font-size: 11px; color: #6d28d9; text-transform: uppercase; font-weight: 600;">
+              {{ meeting.meetingDate | date:'MMM' }}
+            </div>
+          </div>
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-size: 14px; font-weight: 600; color: #111827; margin-bottom: 2px;">
+              {{ formatMeetingDate(meeting.meetingDate) }}
+            </div>
+            <div style="font-size: 13px; color: #6b7280; display: flex; align-items: center; gap: 6px;">
+              <span>📍</span><span>{{ meeting.location }}</span>
+            </div>
+            <div *ngIf="meeting.bookTitle"
+              style="font-size: 13px; color: #7c3aed; margin-top: 4px;">
+              Discussing: <em>{{ meeting.bookTitle }}</em>
+            </div>
+            <div *ngIf="meeting.notes"
+              style="font-size: 12px; color: #9ca3af; margin-top: 4px;">{{ meeting.notes }}</div>
+          </div>
+          <div style="font-size: 12px; color: #6b7280; white-space: nowrap; flex-shrink: 0;">
+            {{ meeting.attendanceCount }} attending
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Discussions -->
+    <div style="background: white; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); padding: 24px 28px;">
+      <h2 style="margin: 0 0 18px; font-size: 18px; font-weight: 700; color: #111827;">Discussion Board</h2>
+
+      <!-- New post form -->
+      <div style="background: #f9fafb; border-radius: 10px; padding: 16px; margin-bottom: 24px;">
+        <div style="font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 8px;">Start a new discussion</div>
+        <textarea [(ngModel)]="newPostContent" rows="3" placeholder="Share your thoughts about the current book or upcoming meeting..."
+          style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; resize: vertical; box-sizing: border-box; font-family: inherit;"></textarea>
+        <div style="margin-top: 10px; display: flex; justify-content: flex-end;">
+          <button (click)="submitDiscussion()"
+            [disabled]="!newPostContent.trim() || postingDiscussion"
+            [style.opacity]="!newPostContent.trim() || postingDiscussion ? '0.5' : '1'"
+            [style.cursor]="!newPostContent.trim() || postingDiscussion ? 'not-allowed' : 'pointer'"
+            style="padding: 9px 20px; background: #7c3aed; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600;">
+            {{ postingDiscussion ? 'Posting...' : 'Post' }}
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="loadingDiscussions" style="color: #6b7280; font-size: 14px;">Loading discussions...</div>
+      <div *ngIf="discussionsError && !loadingDiscussions" style="color: #dc2626; font-size: 14px;">{{ discussionsError }}</div>
+
+      <div *ngIf="!loadingDiscussions && !discussionsError && discussions.length === 0"
+        style="text-align: center; padding: 32px 0; color: #6b7280; font-size: 14px;">
+        No discussions yet. Be the first to start one!
+      </div>
+
+      <div *ngIf="!loadingDiscussions && discussions.length > 0"
+        style="display: flex; flex-direction: column; gap: 16px;">
+        <app-discussion
+          *ngFor="let post of discussions; trackBy: trackById"
+          [post]="post"
+          [clubId]="club.id"
+          [memberId]="memberId"
+          (replied)="onReplied($event)">
+        </app-discussion>
+      </div>
+    </div>
+
+  </div>
+</div>

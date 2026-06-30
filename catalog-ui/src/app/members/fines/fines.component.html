@@ -1,0 +1,47 @@
+<div class="fines-container">
+  <h2>My Fines</h2>
+
+  <div *ngIf="totalUnpaid > 0" class="alert alert-warning">
+    Total outstanding: <strong>{{ totalUnpaid | currency }}</strong>
+  </div>
+
+  <div *ngIf="loading" class="loading-spinner"><div class="spinner"></div></div>
+
+  <div *ngIf="!loading && fines.length === 0" class="empty-state">
+    <p>You have no fines.</p>
+  </div>
+
+  <table *ngIf="!loading && fines.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Book</th>
+        <th>Reason</th>
+        <th>Amount</th>
+        <th>Remaining</th>
+        <th>Date</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let fine of fines">
+        <td>{{ fine.bookTitle }}</td>
+        <td>{{ fine.reason }}</td>
+        <td>{{ fine.amount | currency }}</td>
+        <td>{{ fine.remainingAmount | currency }}</td>
+        <td>{{ fine.createdDate | date:'mediumDate' }}</td>
+        <td><span class="badge" [ngClass]="getStatusClass(fine.status)">{{ fine.status }}</span></td>
+        <td>
+          <button
+            *ngIf="fine.status === 'UNPAID'"
+            (click)="payFine(fine)"
+            [disabled]="payLoading[fine.id]"
+            class="btn btn-sm btn-primary"
+          >{{ payLoading[fine.id] ? 'Processing...' : 'Pay Now' }}</button>
+          <div *ngIf="paySuccess[fine.id]" class="text-success">Paid!</div>
+          <div *ngIf="payError[fine.id]" class="action-error">{{ payError[fine.id] }}</div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

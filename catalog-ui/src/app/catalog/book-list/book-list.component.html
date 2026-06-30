@@ -1,0 +1,77 @@
+<div class="book-list">
+
+  <!-- Search bar -->
+  <div class="search-bar">
+    <div class="search-input-wrap">
+      <svg class="search-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        placeholder="Search by title, author, or ISBN…"
+        (keyup.enter)="search()"
+        class="search-input"
+      />
+      <button *ngIf="searchQuery" (click)="clearSearch()" class="search-clear" title="Clear">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <button (click)="search()" class="btn-search">Search</button>
+  </div>
+
+  <!-- Results count -->
+  <div class="results-bar" *ngIf="isSearchMode">
+    <span class="results-count">{{ totalElements }} result{{ totalElements !== 1 ? 's' : '' }}</span>
+    <span class="results-query"> for "{{ searchQuery }}"</span>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!loading && books.length === 0" class="empty-state">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    <h3>No books found</h3>
+    <p *ngIf="isSearchMode">Try a different search term or browse all books.</p>
+    <p *ngIf="!isSearchMode">The catalog appears to be empty.</p>
+  </div>
+
+  <!-- Books grid -->
+  <div *ngIf="!loading && books.length > 0" class="books-grid">
+    <div
+      *ngFor="let book of books"
+      class="book-card"
+      [routerLink]="['/books', book.id]"
+    >
+      <!-- Cover -->
+      <div class="book-cover">
+        <img *ngIf="book.coverImageUrl" [src]="book.coverImageUrl" [alt]="book.title" loading="lazy" />
+        <div *ngIf="!book.coverImageUrl" class="cover-placeholder">
+          <span class="cover-initial">{{ book.title[0] }}</span>
+        </div>
+        <div class="availability-badge" [class.avail]="book.availableCopies > 0" [class.unavail]="book.availableCopies === 0">
+          {{ book.availableCopies > 0 ? book.availableCopies + ' avail.' : 'Unavailable' }}
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="book-info">
+        <h3 class="book-title" [title]="book.title">{{ book.title }}</h3>
+        <p class="book-authors">{{ book.authorNames ? book.authorNames.join(', ') : '' }}</p>
+        <div class="book-meta">
+          <span class="book-publisher">{{ book.publisherName }}</span>
+          <span class="book-year" *ngIf="book.publicationYear">{{ book.publicationYear }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search result count -->
+  <div *ngIf="isSearchMode" class="search-result-count">
+    {{ totalElements }} result{{ totalElements !== 1 ? 's' : '' }} for &ldquo;{{ searchQuery }}&rdquo;
+  </div>
+
+</div>

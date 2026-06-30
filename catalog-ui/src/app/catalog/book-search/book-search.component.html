@@ -1,0 +1,63 @@
+<div class="search-page">
+  <div class="page-header"><h1>Advanced Search</h1><p>Filter books by title, author, genre, year, and more</p></div>
+  <div class="search-card">
+    <div class="search-grid">
+      <div class="search-field"><label>Title</label><input type="text" [(ngModel)]="searchRequest.title" placeholder="Book title..." class="search-input" /></div>
+      <div class="search-field"><label>Author</label><input type="text" [(ngModel)]="searchRequest.author" placeholder="Author name..." class="search-input" /></div>
+      <div class="search-field"><label>ISBN</label><input type="text" [(ngModel)]="searchRequest.isbn" placeholder="ISBN..." class="search-input" /></div>
+      <div class="search-field">
+        <label>Genre</label>
+        <select [(ngModel)]="searchRequest.genre" class="search-input">
+          <option value="">All Genres</option>
+          <option *ngFor="let genre of genres" [value]="genre">{{ genre }}</option>
+        </select>
+      </div>
+      <div class="search-field">
+        <label>Language</label>
+        <select [(ngModel)]="searchRequest.language" class="search-input">
+          <option value="">All Languages</option>
+          <option *ngFor="let lang of languages" [value]="lang">{{ lang }}</option>
+        </select>
+      </div>
+      <div class="search-field"><label>Year From</label><input type="number" [(ngModel)]="searchRequest.yearFrom" placeholder="e.g. 2000" class="search-input" /></div>
+      <div class="search-field"><label>Year To</label><input type="number" [(ngModel)]="searchRequest.yearTo" placeholder="e.g. 2024" class="search-input" /></div>
+      <div class="search-field avail-field">
+        <label class="avail-check"><input type="checkbox" [(ngModel)]="searchRequest.availableOnly" /><span>Available copies only</span></label>
+      </div>
+    </div>
+    <div class="search-actions">
+      <button (click)="search()" class="btn btn-primary">Search</button>
+      <button (click)="reset()" class="btn btn-secondary">Clear</button>
+    </div>
+  </div>
+  <div *ngIf="loading" class="loading-spinner"><div class="spinner"></div></div>
+  <div *ngIf="!loading && results">
+    <div class="results-header"><span class="results-count">{{ results.totalElements }} result{{ results.totalElements !== 1 ? 's' : '' }}</span></div>
+    <div *ngIf="results.books.length === 0" class="empty-state">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <p>No books match your search criteria.</p>
+    </div>
+    <div class="results-list">
+      <div *ngFor="let book of results.books" class="result-card" [routerLink]="['/books', book.id]">
+        <div class="result-thumb">
+          <img *ngIf="book.coverImageUrl" [src]="book.coverImageUrl" [alt]="book.title" />
+          <div *ngIf="!book.coverImageUrl" class="result-thumb-ph">{{ book.title[0] }}</div>
+        </div>
+        <div class="result-info">
+          <h3 class="result-title">{{ book.title }}</h3>
+          <p class="result-authors">{{ book.authorNames.join(', ') }}</p>
+          <p class="result-pub">{{ book.publisherName }} &middot; {{ book.publicationYear }}</p>
+          <span class="avail-badge" [class.avail-ok]="book.availableCopies > 0" [class.avail-none]="book.availableCopies === 0">
+            {{ book.availableCopies > 0 ? book.availableCopies + ' copies available' : 'Not available' }}
+          </span>
+        </div>
+        <svg class="result-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+    <div *ngIf="results.totalPages > 1" class="pagination">
+      <button (click)="loadPage(results.currentPage - 1)" [disabled]="results.currentPage === 0" class="page-btn">&#8592;</button>
+      <span class="page-info">{{ results.currentPage + 1 }} / {{ results.totalPages }}</span>
+      <button (click)="loadPage(results.currentPage + 1)" [disabled]="results.currentPage >= results.totalPages - 1" class="page-btn">&#8594;</button>
+    </div>
+  </div>
+</div>

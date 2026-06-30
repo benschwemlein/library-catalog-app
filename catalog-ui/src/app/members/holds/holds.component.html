@@ -1,0 +1,47 @@
+<div class="holds-container">
+  <h2>My Holds</h2>
+
+  <div *ngIf="loading" class="loading-spinner"><div class="spinner"></div></div>
+
+  <div *ngIf="!loading && holds.length === 0" class="empty-state">
+    <p>You have no active holds.</p>
+  </div>
+
+  <table *ngIf="!loading && holds.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Book</th>
+        <th>Author(s)</th>
+        <th>Placed</th>
+        <th>Pickup Branch</th>
+        <th>Queue Position</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let hold of holds">
+        <td>{{ hold.bookTitle }}</td>
+        <td>{{ hold.authorNames.join(', ') }}</td>
+        <td>{{ hold.placedDate | date:'mediumDate' }}</td>
+        <td>{{ hold.pickupBranchName }}</td>
+        <td>
+          <span *ngIf="hold.queuePosition">#{{ hold.queuePosition }}</span>
+          <small *ngIf="hold.estimatedWaitDays"> (~{{ hold.estimatedWaitDays }} days)</small>
+          <span *ngIf="!hold.queuePosition">-</span>
+        </td>
+        <td><span class="badge" [ngClass]="getStatusClass(hold.status)">{{ hold.status }}</span></td>
+        <td>
+          <button
+            *ngIf="hold.status === 'PENDING' || hold.status === 'READY'"
+            (click)="cancelHold(hold.id)"
+            [disabled]="cancelLoading[hold.id]"
+            class="btn btn-sm btn-danger"
+          >{{ cancelLoading[hold.id] ? 'Cancelling...' : 'Cancel' }}</button>
+          <div *ngIf="cancelError[hold.id]" class="action-error">{{ cancelError[hold.id] }}</div>
+          <span *ngIf="hold.status === 'READY'" class="ready-notice">Ready for pickup!</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

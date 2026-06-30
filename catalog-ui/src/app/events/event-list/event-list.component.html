@@ -1,0 +1,118 @@
+<div class="events-page">
+
+  <!-- Header + filter row -->
+  <div class="events-header">
+    <div>
+      <h1>Events</h1>
+      <p>Upcoming programs and activities at your library</p>
+    </div>
+    <div class="filter-row">
+      <select [(ngModel)]="typeFilter" (ngModelChange)="applyFilter()" class="type-select">
+        <option value="">All types</option>
+        <option *ngFor="let type of eventTypes" [value]="type">{{ type }}</option>
+      </select>
+      <button (click)="createOpen = !createOpen" class="create-btn">+ Create Event</button>
+    </div>
+  </div>
+
+  <div *ngIf="createOpen" class="create-panel animate-in">
+    <h3 class="create-heading">New Event</h3>
+    <div class="create-grid">
+      <div class="create-field">
+        <label class="create-label">Title *</label>
+        <input [(ngModel)]="newEvent.title" placeholder="Event title" class="create-input" />
+      </div>
+      <div class="create-field">
+        <label class="create-label">Type</label>
+        <select [(ngModel)]="newEvent.eventType" class="create-input">
+          <option *ngFor="let t of eventTypes" [value]="t">{{ t.replace('_', ' ') }}</option>
+        </select>
+      </div>
+      <div class="create-field">
+        <label class="create-label">Branch</label>
+        <select [(ngModel)]="newEvent.branchId" class="create-input">
+          <option *ngFor="let b of branches" [value]="b.id">{{ b.name }}</option>
+        </select>
+      </div>
+      <div class="create-field">
+        <label class="create-label">Capacity</label>
+        <input type="number" [(ngModel)]="newEvent.capacity" class="create-input" />
+      </div>
+      <div class="create-field">
+        <label class="create-label">Start</label>
+        <input type="datetime-local" [(ngModel)]="newEvent.startDateTime" class="create-input" />
+      </div>
+      <div class="create-field">
+        <label class="create-label">End</label>
+        <input type="datetime-local" [(ngModel)]="newEvent.endDateTime" class="create-input" />
+      </div>
+      <div class="create-field create-field-full">
+        <label class="create-label">Description</label>
+        <textarea [(ngModel)]="newEvent.description" rows="2" class="create-input create-textarea"></textarea>
+      </div>
+    </div>
+    <div *ngIf="createError" class="create-error">{{ createError }}</div>
+    <div class="create-actions">
+      <button (click)="createEvent()" [disabled]="creating" class="btn btn-primary">{{ creating ? 'Creating...' : 'Create Event' }}</button>
+      <button (click)="createOpen = false; createError = ''" class="btn btn-secondary">Cancel</button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-spinner"><div class="spinner"></div></div>
+
+  <div *ngIf="!loading && filteredEvents.length === 0" class="empty-state">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+      <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+      <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+    </svg>
+    <h3>No upcoming events</h3>
+    <p>Check back soon for new programs and activities.</p>
+  </div>
+
+  <div *ngIf="!loading && filteredEvents.length > 0" class="events-grid animate-in">
+    <div *ngFor="let event of filteredEvents" class="event-card" [routerLink]="['/events', event.id]">
+
+      <!-- Cover / placeholder -->
+      <div class="event-cover" [attr.data-type]="event.type">
+        <img *ngIf="event.imageUrl" [src]="event.imageUrl" [alt]="event.title" loading="lazy" />
+        <div *ngIf="!event.imageUrl" class="event-cover-placeholder">
+          <span class="event-type-glyph">{{ getEventTypeIcon(event.type) }}</span>
+        </div>
+        <span class="event-type-chip">{{ event.type }}</span>
+      </div>
+
+      <!-- Body -->
+      <div class="event-body">
+        <h3 class="event-title">{{ event.title }}</h3>
+
+        <div class="event-meta">
+          <div class="meta-row">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            {{ event.startDate | date:'EEE, MMM d · h:mm a' }}
+          </div>
+          <div class="meta-row">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            {{ event.branchName }}
+          </div>
+          <div class="meta-row" *ngIf="event.hostName">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            {{ event.hostName }}
+          </div>
+        </div>
+
+        <div class="event-footer">
+          <span class="spots-badge"
+            [class.spots-ok]="event.spotsAvailable > 5"
+            [class.spots-few]="isSoonFull(event) && event.spotsAvailable > 0"
+            [class.spots-full]="event.spotsAvailable === 0">
+            <ng-container *ngIf="event.spotsAvailable > 0">{{ event.spotsAvailable }} spots left</ng-container>
+            <ng-container *ngIf="event.spotsAvailable === 0">Fully Booked</ng-container>
+          </span>
+          <span *ngIf="event.registrationRequired" class="reg-badge">Registration required</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

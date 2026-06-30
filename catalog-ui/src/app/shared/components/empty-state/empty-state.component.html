@@ -1,0 +1,13 @@
+<div class="empty-state d-flex flex-column align-items-center justify-content-center py-5 text-center">
+  <i class="bi fs-1 text-muted mb-3" [ngClass]="icon"></i>
+  <h5 class="text-muted mb-1">{{ message }}</h5>
+  <p *ngIf="subMessage" class="text-muted small mb-3">{{ subMessage }}</p>
+  <button
+    *ngIf="actionLabel"
+    type="button"
+    class="btn btn-primary mt-2"
+    (click)="onAction()"
+  >
+    {{ actionLabel }}
+  </button>
+</div>

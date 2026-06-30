@@ -1,0 +1,78 @@
+<div class="auth-page">
+  <div class="form-container">
+
+    <div class="brand-mark">
+      <div class="brand-icon">📚</div>
+      <span class="brand-name">City Library</span>
+    </div>
+
+    <h2>Create account</h2>
+    <p class="subtitle">Join the library system</p>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div *ngIf="toastMessage" class="toast-message">
+        <span>⚠</span> {{ toastMessage }}
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+        <div class="form-group">
+          <label for="firstname">First name <span class="required-mark">*</span></label>
+          <input type="text" id="firstname" formControlName="firstname" placeholder="Alice"
+            [class.is-invalid]="registerForm.get('firstname')?.invalid && registerForm.get('firstname')?.touched" />
+          <div *ngIf="registerForm.get('firstname')?.errors?.['required'] && registerForm.get('firstname')?.touched" class="invalid-feedback">
+            First name is required
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="lastname">Last name <span class="required-mark">*</span></label>
+          <input type="text" id="lastname" formControlName="lastname" placeholder="Smith"
+            [class.is-invalid]="registerForm.get('lastname')?.invalid && registerForm.get('lastname')?.touched" />
+          <div *ngIf="registerForm.get('lastname')?.errors?.['required'] && registerForm.get('lastname')?.touched" class="invalid-feedback">
+            Last name is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email address <span class="required-mark">*</span></label>
+        <input type="email" id="email" formControlName="email" placeholder="you@example.com"
+          [class.is-invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" />
+        <div *ngIf="registerForm.get('email')?.errors?.['required'] && registerForm.get('email')?.touched" class="invalid-feedback">
+          Email is required
+        </div>
+        <div *ngIf="registerForm.get('email')?.errors?.['email'] && registerForm.get('email')?.touched" class="invalid-feedback">
+          Please enter a valid email address
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password <span class="required-mark">*</span></label>
+        <input type="password" id="password" formControlName="password" placeholder="••••••••"
+          [class.is-invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" />
+        <div *ngIf="registerForm.get('password')?.errors?.['required'] && registerForm.get('password')?.touched" class="invalid-feedback">
+          Password is required
+        </div>
+        <div *ngIf="registerForm.get('password')?.errors?.['minlength'] && registerForm.get('password')?.touched" class="invalid-feedback">
+          Password must be at least 6 characters
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="role">Role</label>
+        <select id="role" formControlName="role">
+          <option value="" disabled>Select a role</option>
+          <option *ngFor="let roleOption of roles" [ngValue]="roleOption.value">{{ roleOption.label }}</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary" [disabled]="!registerForm.valid">
+        Create account
+      </button>
+    </form>
+
+    <div class="form-footer">
+      Already have an account? <a routerLink="/login">Sign in</a>
+    </div>
+
+  </div>
+</div>

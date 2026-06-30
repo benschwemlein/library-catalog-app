@@ -1,0 +1,56 @@
+<div class="current-loans-container">
+  <h2>Current Loans</h2>
+
+  <div *ngIf="loading" class="loading-spinner"><div class="spinner"></div></div>
+
+  <div *ngIf="!loading && loans.length === 0" class="empty-state">
+    <p>You have no active loans.</p>
+  </div>
+
+  <table *ngIf="!loading && loans.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Book</th>
+        <th>Author(s)</th>
+        <th>Checkout Date</th>
+        <th>Due Date</th>
+        <th>Renewals</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let loan of loans" [class.overdue-row]="isOverdue(loan)">
+        <td>{{ loan.bookTitle }}</td>
+        <td>{{ loan.authorNames.join(', ') }}</td>
+        <td>{{ loan.checkoutDate | date:'mediumDate' }}</td>
+        <td>
+          <span [class.text-danger]="isOverdue(loan)">{{ loan.dueDate | date:'mediumDate' }}</span>
+          <small *ngIf="isOverdue(loan)" class="overdue-label">{{ getDaysOverdue(loan) }} days overdue</small>
+        </td>
+        <td>{{ loan.renewalCount }}/{{ loan.maxRenewals }}</td>
+        <td>
+          <span class="badge" [class.badge-danger]="isOverdue(loan)" [class.badge-success]="!isOverdue(loan)">
+            {{ loan.status }}
+          </span>
+        </td>
+        <td>
+          <div class="action-buttons">
+            <button
+              (click)="renewLoan(loan.id)"
+              [disabled]="actionLoading[loan.id] || loan.renewalCount >= loan.maxRenewals"
+              class="btn btn-sm btn-primary"
+            >{{ actionLoading[loan.id] ? '...' : 'Renew' }}</button>
+            <button
+              (click)="returnBook(loan.id)"
+              [disabled]="actionLoading[loan.id]"
+              class="btn btn-sm btn-secondary"
+            >Return</button>
+          </div>
+          <div *ngIf="actionSuccess[loan.id]" class="action-success">{{ actionSuccess[loan.id] }}</div>
+          <div *ngIf="actionError[loan.id]" class="action-error">{{ actionError[loan.id] }}</div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

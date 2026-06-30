@@ -1,0 +1,94 @@
+<div class="file-upload-wrapper">
+
+  <!-- Drop Zone -->
+  <div
+    *ngIf="!selectedFile"
+    class="drop-zone border rounded p-4 text-center"
+    [class.drag-active]="isDragging"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+    (click)="triggerFileInput(fileInput)"
+    role="button"
+    tabindex="0"
+    aria-label="Upload file — click or drag and drop"
+    (keydown.enter)="triggerFileInput(fileInput)"
+    (keydown.space)="triggerFileInput(fileInput)"
+  >
+    <i class="bi bi-cloud-upload fs-1 text-primary d-block mb-2"></i>
+    <p class="mb-1 fw-semibold">Drag &amp; drop a file here, or click to browse</p>
+    <p class="text-muted small mb-0">
+      Accepted: {{ acceptedTypes.join(', ') }} &bull; Max {{ maxSizeMb }} MB
+    </p>
+  </div>
+
+  <!-- Hidden native file input -->
+  <input
+    #fileInput
+    type="file"
+    class="d-none"
+    [attr.accept]="acceptAttribute"
+    (change)="onFileInputChange($event)"
+  />
+
+  <!-- Selected file preview -->
+  <div *ngIf="selectedFile" class="selected-file border rounded p-3 mt-2">
+    <div class="d-flex align-items-center gap-3">
+
+      <!-- Image preview -->
+      <img
+        *ngIf="previewUrl"
+        [src]="previewUrl"
+        alt="File preview"
+        class="img-thumbnail"
+        style="width: 64px; height: 64px; object-fit: cover;"
+      />
+
+      <!-- Generic file icon -->
+      <i *ngIf="!previewUrl" class="bi bi-file-earmark fs-1 text-secondary"></i>
+
+      <div class="flex-grow-1 overflow-hidden">
+        <p class="mb-0 fw-semibold text-truncate">{{ selectedFile.name }}</p>
+        <p class="mb-0 text-muted small">{{ formattedSize }}</p>
+      </div>
+
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-danger flex-shrink-0"
+        aria-label="Remove file"
+        (click)="clearSelection()"
+      >
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Error message -->
+  <div *ngIf="errorMessage" class="alert alert-danger mt-2 py-2 small mb-0">
+    <i class="bi bi-exclamation-triangle-fill me-1"></i>
+    {{ errorMessage }}
+  </div>
+
+</div>
+
+<style>
+  .drop-zone {
+    cursor: pointer;
+    border-style: dashed !important;
+    border-color: #6c757d !important;
+    transition: background-color 0.2s, border-color 0.2s;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .drop-zone:hover,
+  .drop-zone:focus,
+  .drop-zone.drag-active {
+    background-color: rgba(13, 110, 253, 0.05);
+    border-color: #0d6efd !important;
+    outline: none;
+  }
+</style>

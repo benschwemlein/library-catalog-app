@@ -1,0 +1,21 @@
+.notifications-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+.notifications-header h2 { font-size:1.5rem; font-weight:700; color:#f1f5f9; margin:0; }
+.header-actions { display:flex; align-items:center; gap:10px; }
+.unread-count { background:rgba(99,102,241,0.2); color:#a5b4fc; font-size:0.72rem; font-weight:700; padding:3px 10px; border-radius:999px; }
+.btn-secondary { background:rgba(148,163,184,0.1); color:#94a3b8; border:1px solid rgba(148,163,184,0.2); border-radius:8px; padding:6px 12px; font-size:0.78rem; cursor:pointer; transition:background 0.15s; }
+.btn-secondary:hover { background:rgba(148,163,184,0.18); }
+.btn-sm { padding:5px 10px !important; font-size:0.75rem !important; }
+.loading-spinner { display:flex; align-items:center; justify-content:center; padding:60px; }
+.spinner { width:32px; height:32px; border:3px solid rgba(148,163,184,0.12); border-top-color:#6366f1; border-radius:50%; animation:spin 0.8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.empty-state { display:flex; flex-direction:column; align-items:center; gap:12px; padding:60px; text-align:center; color:#475569; }
+.notification-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:4px; }
+.notification-item { display:flex; align-items:flex-start; gap:14px; padding:16px 18px; background:#1e293b; border:1px solid rgba(148,163,184,0.08); border-radius:12px; cursor:pointer; transition:background 0.15s; position:relative; }
+.notification-item:hover { background:#263248; }
+.notification-item.unread { border-left:3px solid #6366f1; padding-left:15px; }
+.notification-icon { font-size:1.3rem; flex-shrink:0; margin-top:2px; }
+.notification-content { flex:1; min-width:0; }
+.notification-content strong { display:block; font-size:0.88rem; color:#e2e8f0; margin-bottom:3px; }
+.notification-content p { font-size:0.82rem; color:#94a3b8; margin:0 0 4px; line-height:1.5; }
+.notification-content small { font-size:0.7rem; color:#475569; }
+.unread-dot { position:absolute; top:14px; right:14px; width:8px; height:8px; border-radius:50%; background:#6366f1; flex-shrink:0; }

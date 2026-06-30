@@ -1,0 +1,109 @@
+<div class="table-responsive">
+  <!-- Loading skeleton -->
+  <table *ngIf="loading" [class]="getTableClasses()" aria-label="Loading...">
+    <thead class="table-light">
+      <tr>
+        <th *ngFor="let col of columns" [style.width]="col.width">
+          <span class="placeholder col-8 rounded"></span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of skeletonRows" class="placeholder-glow">
+        <td *ngFor="let col of columns">
+          <span class="placeholder col-{{ (6 + (columns.indexOf(col) % 4)) }} rounded"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Empty state -->
+  <div *ngIf="!loading && (!sortedData || sortedData.length === 0)"
+       class="text-center py-5 text-muted">
+    <i class="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i>
+    <p class="mb-1 fw-semibold">{{ emptyMessage }}</p>
+    <p *ngIf="emptySubMessage" class="small">{{ emptySubMessage }}</p>
+  </div>
+
+  <!-- Data table -->
+  <table *ngIf="!loading && sortedData && sortedData.length > 0"
+         [class]="getTableClasses()"
+         role="table">
+    <thead class="table-light">
+      <tr>
+        <th *ngFor="let col of columns"
+            scope="col"
+            [style.width]="col.width"
+            [class.sortable-header]="col.sortable"
+            [class.sorted]="isSortedBy(col.field)"
+            (click)="sort(col)"
+            [attr.aria-sort]="isSortedBy(col.field) ? sortDirection + 'ending' : 'none'">
+          <span class="d-flex align-items-center gap-1">
+            {{ col.header }}
+            <i *ngIf="col.sortable"
+               [class]="'bi ' + getSortIcon(col)"
+               [class.text-primary]="isSortedBy(col.field)"
+               aria-hidden="true"
+               style="font-size: 0.75rem;"></i>
+          </span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of sortedData; trackBy: trackBy"
+          [class.clickable-row]="rowClick.observed"
+          (click)="onRowClick(row)"
+          role="row">
+        <td *ngFor="let col of columns"
+            [class]="col.cssClass || ''"
+            role="cell">
+          <ng-container [ngSwitch]="col.pipe">
+            <ng-container *ngSwitchCase="'date'">
+              {{ getValue(row, col.field) | date: (col.pipeArgs || 'mediumDate') }}
+            </ng-container>
+            <ng-container *ngSwitchCase="'currency'">
+              {{ getValue(row, col.field) | currency: (col.pipeArgs || 'USD') }}
+            </ng-container>
+            <ng-container *ngSwitchCase="'titlecase'">
+              {{ getValue(row, col.field) | titlecase }}
+            </ng-container>
+            <ng-container *ngSwitchCase="'uppercase'">
+              {{ getValue(row, col.field) | uppercase }}
+            </ng-container>
+            <ng-container *ngSwitchCase="'lowercase'">
+              {{ getValue(row, col.field) | lowercase }}
+            </ng-container>
+            <ng-container *ngSwitchCase="'number'">
+              {{ getValue(row, col.field) | number: (col.pipeArgs || '1.0-2') }}
+            </ng-container>
+            <ng-container *ngSwitchCase="'percent'">
+              {{ getValue(row, col.field) | percent: (col.pipeArgs || '1.0-1') }}
+            </ng-container>
+            <ng-container *ngSwitchDefault>
+              {{ getValue(row, col.field) }}
+            </ng-container>
+          </ng-container>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .sortable-header {
+    cursor: pointer;
+    user-select: none;
+  }
+  .sortable-header:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  .sorted {
+    background-color: rgba(13, 110, 253, 0.05);
+  }
+  .clickable-row {
+    cursor: pointer;
+  }
+  .clickable-row:hover td {
+    background-color: rgba(13, 110, 253, 0.04);
+  }
+</style>

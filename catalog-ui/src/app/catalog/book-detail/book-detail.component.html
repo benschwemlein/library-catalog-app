@@ -1,0 +1,111 @@
+<div class="book-detail-page">
+  <a (click)="goBack()" class="back-link">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to Books
+  </a>
+  <div *ngIf="loading" class="loading-spinner"><div class="spinner"></div></div>
+  <div *ngIf="!loading && book" class="book-layout animate-in">
+    <div class="book-cover-col">
+      <div class="book-cover-wrap">
+        <img *ngIf="book.coverImageUrl" [src]="book.coverImageUrl" [alt]="book.title" class="book-cover-img" />
+        <div *ngIf="!book.coverImageUrl" class="book-cover-ph"><span class="cover-letter">{{ book.title[0] }}</span></div>
+      </div>
+      <div class="avail-card">
+        <span class="avail-pill" [class.avail-ok]="book.availableCopies > 0" [class.avail-none]="book.availableCopies === 0">
+          <span class="avail-dot"></span>{{ book.availableCopies }} of {{ book.totalCopies }} available
+        </span>
+
+        <!-- Checkout (available copies exist) -->
+        <ng-container *ngIf="book.availableCopies > 0 && !checkoutSuccess">
+          <button *ngIf="!checkoutOpen" (click)="openCheckout()" class="btn btn-primary hold-btn">Checkout</button>
+          <div *ngIf="checkoutOpen" class="checkout-inline">
+            <div class="checkout-btns">
+              <button (click)="doCheckout()" [disabled]="checkoutLoading" class="btn btn-primary btn-sm">
+                {{ checkoutLoading ? 'Processing...' : 'Confirm Checkout' }}
+              </button>
+              <button (click)="checkoutOpen = false" class="btn btn-secondary btn-sm">Cancel</button>
+            </div>
+            <div *ngIf="checkoutError" class="inline-error">{{ checkoutError }}</div>
+          </div>
+        </ng-container>
+        <div *ngIf="checkoutSuccess" class="inline-success">Checked out successfully!</div>
+
+        <!-- Hold (no available copies) -->
+        <ng-container *ngIf="book.availableCopies === 0 && !checkoutSuccess">
+          <button (click)="placeHold()" [disabled]="holdLoading || holdSuccess" class="btn btn-primary hold-btn">
+            {{ holdLoading ? 'Placing Hold...' : holdSuccess ? 'Hold Placed!' : 'Place Hold' }}
+          </button>
+          <div *ngIf="holdError" class="inline-error">{{ holdError }}</div>
+          <div *ngIf="holdSuccess" class="inline-success">Hold placed!</div>
+        </ng-container>
+      </div>
+    </div>
+    <div class="book-meta-col">
+      <h1 class="book-title">{{ book.title }}</h1>
+      <p *ngIf="book.subtitle" class="book-subtitle">{{ book.subtitle }}</p>
+      <p class="book-authors">{{ book.authorNames.join(', ') }}</p>
+      <div class="meta-pills">
+        <span class="meta-pill">{{ book.publisherName }}</span>
+        <span class="meta-pill">{{ book.publicationYear }}</span>
+        <span class="meta-pill">{{ book.language }}</span>
+        <span class="meta-pill">{{ book.pageCount }} pages</span>
+      </div>
+      <div class="isbn-row">ISBN: {{ book.isbn }}</div>
+      <div class="genres" *ngIf="book.genreNames.length > 0">
+        <span *ngFor="let genre of book.genreNames" class="genre-chip">{{ genre }}</span>
+      </div>
+      <div class="rating-row" *ngIf="book.averageRating">
+        <span *ngFor="let star of getStarArray(book.averageRating)" class="star" [class.star-filled]="star === 1">&#9733;</span>
+        <span class="rating-value">{{ book.averageRating | number:'1.1-1' }}</span>
+      </div>
+      <div *ngIf="book.description" class="description-section">
+        <h3 class="section-heading">About this book</h3>
+        <p class="description-text">{{ book.description }}</p>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="!loading && book" class="sub-section animate-in">
+    <h3 class="section-heading">Copies</h3>
+    <div *ngIf="copiesLoading" class="loading-spinner"><div class="spinner"></div></div>
+    <table *ngIf="!copiesLoading && copies.length > 0" class="sub-table">
+      <thead><tr><th>Barcode</th><th>Branch</th><th>Condition</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let copy of copies">
+          <td class="td-mono">{{ copy.barcode }}</td>
+          <td>{{ copy.branchName }}</td>
+          <td>{{ copy.condition }}</td>
+          <td><span class="status-chip" [class.chip-ok]="copy.status === 'AVAILABLE'" [class.chip-warn]="copy.status !== 'AVAILABLE'">{{ copy.status }}</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <p *ngIf="!copiesLoading && copies.length === 0" class="empty-note">No copies found.</p>
+  </div>
+  <div *ngIf="!loading && book" class="sub-section animate-in">
+    <h3 class="section-heading">Reviews</h3>
+    <div class="reviews-list" *ngIf="reviews.length > 0">
+      <div *ngFor="let review of reviews" class="review-card">
+        <div class="review-header">
+          <div class="reviewer-avatar">{{ review.memberName[0] }}</div>
+          <div class="reviewer-info"><strong>{{ review.memberName }}</strong><span class="review-date">{{ review.createdAt | date:'mediumDate' }}</span></div>
+          <div class="review-stars">
+            <span *ngFor="let star of getStarArray(review.rating)" class="star" [class.star-filled]="star === 1">&#9733;</span>
+          </div>
+        </div>
+        <h4 *ngIf="review.title" class="review-title">{{ review.title }}</h4>
+        <p *ngIf="review.body" class="review-body">{{ review.body }}</p>
+      </div>
+    </div>
+    <p *ngIf="reviews.length === 0" class="empty-note">No reviews yet — be the first!</p>
+    <div class="write-review">
+      <h4 class="section-heading">Write a Review</h4>
+      <div class="star-select">
+        <span *ngFor="let s of ratingStars" (click)="newReview.rating = s" class="star star-pick" [class.star-filled]="s <= newReview.rating">&#9733;</span>
+      </div>
+      <input type="text" [(ngModel)]="newReview.title" placeholder="Review title" class="review-input" />
+      <textarea [(ngModel)]="newReview.body" placeholder="Share your thoughts..." rows="4" class="review-input review-textarea"></textarea>
+      <button (click)="submitReview()" [disabled]="reviewSubmitting" class="btn btn-primary">{{ reviewSubmitting ? 'Submitting...' : 'Submit Review' }}</button>
+      <div *ngIf="reviewSuccess" class="inline-success">Review submitted!</div>
+      <div *ngIf="reviewError" class="inline-error">{{ reviewError }}</div>
+    </div>
+  </div>
+</div>

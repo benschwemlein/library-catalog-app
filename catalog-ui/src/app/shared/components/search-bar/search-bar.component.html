@@ -1,0 +1,31 @@
+<div class="input-group">
+  <!-- Search icon -->
+  <span class="input-group-text bg-white border-end-0">
+    <span *ngIf="!isLoading" class="bi bi-search text-muted"></span>
+    <span *ngIf="isLoading"
+          class="spinner-border spinner-border-sm text-secondary"
+          role="status" aria-hidden="true">
+    </span>
+  </span>
+
+  <!-- Text input -->
+  <input
+    type="text"
+    class="form-control border-start-0 border-end-0 ps-0"
+    [placeholder]="placeholder"
+    [ngModel]="searchTerm"
+    (ngModelChange)="onInput($event)"
+    aria-label="Search"
+  />
+
+  <!-- Clear button -->
+  <button
+    *ngIf="searchTerm.length > 0"
+    type="button"
+    class="btn btn-outline-secondary border-start-0"
+    aria-label="Clear search"
+    (click)="clear()"
+  >
+    <span class="bi bi-x-lg"></span>
+  </button>
+</div>

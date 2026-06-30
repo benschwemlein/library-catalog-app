@@ -1,0 +1,235 @@
+/* ── App Shell ─────────────────────────────────────────────── */
+.app-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas: "header" "content" "footer";
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+.header {
+  grid-area: header;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(99, 102, 241, 0.18);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.03), 0 4px 24px rgba(0,0,0,0.4);
+}
+
+/* ── Logo ──────────────────────────────────────────────────── */
+.title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
+  margin-right: 8px;
+}
+.title::before {
+  content: '';
+  display: block;
+  width: 26px;
+  height: 26px;
+  background: linear-gradient(135deg, #6366f1, #06b6d4);
+  border-radius: 7px;
+  flex-shrink: 0;
+  box-shadow: 0 0 14px rgba(99, 102, 241, 0.55);
+}
+
+/* ── Nav bar ───────────────────────────────────────────────── */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2px;
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.navbar::-webkit-scrollbar { display: none; }
+
+/* ── Nav groups / dropdowns ────────────────────────────────── */
+.nav-group {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.nav-group > a {
+  display: flex;
+  align-items: center;
+  padding: 7px 12px;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  border-radius: 6px;
+  white-space: nowrap;
+  transition: color 0.15s ease, background 0.15s ease;
+  letter-spacing: 0.01em;
+}
+
+.nav-group > a:hover {
+  color: #fff;
+  background: rgba(99, 102, 241, 0.15);
+}
+
+.nav-group > a.active {
+  color: #a5b4fc;
+  background: rgba(99, 102, 241, 0.1);
+}
+
+/* Dropdown */
+.dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: #1e293b;
+  border: 1px solid rgba(148,163,184,0.2);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.4);
+  min-width: 185px;
+  padding: 6px;
+  z-index: 500;
+  animation: dropIn 0.12s ease both;
+}
+
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.nav-group:hover .dropdown {
+  display: block;
+}
+
+.dropdown a {
+  display: block;
+  padding: 8px 12px;
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  border-radius: 7px;
+  white-space: nowrap;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.dropdown a:hover {
+  background: rgba(99, 102, 241, 0.14);
+  color: #f1f5f9;
+}
+
+/* ── Auth area — pinned to right of header, never scrolls away ── */
+.nav-auth {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding-left: 12px;
+  border-left: 1px solid rgba(148,163,184,0.15);
+  margin-left: 8px;
+}
+
+.nav-auth a {
+  padding: 7px 13px;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.nav-auth a:hover { color: #fff; background: rgba(255,255,255,0.07); }
+
+.btn-register {
+  background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+  color: #fff !important;
+  box-shadow: 0 3px 10px rgba(99,102,241,0.4) !important;
+  padding: 7px 16px !important;
+  font-weight: 600 !important;
+}
+.btn-register:hover {
+  box-shadow: 0 4px 16px rgba(99,102,241,0.55) !important;
+  transform: translateY(-1px);
+}
+
+/* User chip + logout */
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-name {
+  color: #f1f5f9;
+  font-size: 0.82rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.logout-btn {
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #f43f5e, #e11d48);
+  border: none;
+  padding: 6px 16px;
+  border-radius: 6px;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 8px rgba(244,63,94,0.4);
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.logout-btn:hover {
+  background: linear-gradient(135deg, #e11d48, #be123c);
+  box-shadow: 0 4px 14px rgba(244,63,94,0.55);
+  transform: translateY(-1px);
+}
+
+/* ── Main content ─────────────────────────────────────────── */
+.content {
+  grid-area: content;
+  padding: 32px 36px;
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  animation: fadeIn 0.3s ease both;
+}
+
+/* ── Footer ────────────────────────────────────────────────── */
+.footer {
+  grid-area: footer;
+  padding: 20px 24px;
+  background: var(--color-bg);
+  border-top: 1px solid rgba(148,163,184,0.08);
+  color: #475569;
+  text-align: center;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .header { padding: 0 14px; height: auto; min-height: 56px; flex-wrap: wrap; }
+  .content { padding: 20px 16px; }
+  .nav-group > a { font-size: 0.78rem; padding: 6px 9px; }
+}

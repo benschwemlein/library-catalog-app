@@ -1,0 +1,90 @@
+<div style="border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden;">
+
+  <!-- Post header + body -->
+  <div style="padding: 14px 16px;">
+    <div style="display: flex; align-items: flex-start; gap: 12px;">
+      <!-- Avatar -->
+      <div [style.background]="getAvatarColor(post.posterName)"
+        style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; flex-shrink: 0;">
+        {{ getInitials(post.posterName) }}
+      </div>
+
+      <div style="flex: 1; min-width: 0;">
+        <!-- Author line -->
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap;">
+          <span style="font-size: 14px; font-weight: 600; color: #111827;">{{ post.posterName }}</span>
+          <span style="font-size: 12px; color: #9ca3af;">{{ formatTimestamp(post.postedAt) }}</span>
+          <span *ngIf="post.edited"
+            style="font-size: 11px; color: #9ca3af; font-style: italic;">(edited)</span>
+        </div>
+
+        <!-- Content -->
+        <p style="margin: 0; font-size: 14px; color: #374151; line-height: 1.65; white-space: pre-wrap;">{{ post.content }}</p>
+      </div>
+    </div>
+
+    <!-- Action row -->
+    <div style="display: flex; align-items: center; gap: 12px; margin-top: 12px; padding-left: 48px;">
+      <button (click)="toggleReplyForm()"
+        style="background: none; border: none; color: #7c3aed; font-size: 13px; font-weight: 500; cursor: pointer; padding: 0; display: flex; align-items: center; gap: 4px;">
+        {{ replyFormVisible ? 'Cancel' : 'Reply' }}
+      </button>
+
+      <button *ngIf="(post.replyCount ?? 0) > 0 || replies.length > 0"
+        (click)="toggleReplies()"
+        style="background: none; border: none; color: #6b7280; font-size: 13px; cursor: pointer; padding: 0; display: flex; align-items: center; gap: 4px;">
+        <span *ngIf="loadingReplies">Loading...</span>
+        <span *ngIf="!loadingReplies && !repliesVisible">
+          Show {{ post.replyCount ?? replies.length }} {{ (post.replyCount ?? replies.length) === 1 ? 'reply' : 'replies' }}
+        </span>
+        <span *ngIf="!loadingReplies && repliesVisible">Hide replies</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Inline reply form -->
+  <div *ngIf="replyFormVisible"
+    style="border-top: 1px solid #f3f4f6; background: #f9fafb; padding: 12px 16px 12px 64px;">
+    <textarea [(ngModel)]="replyContent" rows="2" placeholder="Write a reply..."
+      style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; resize: none; box-sizing: border-box; font-family: inherit;"></textarea>
+    <div *ngIf="replyError" style="font-size: 12px; color: #dc2626; margin-top: 4px;">{{ replyError }}</div>
+    <div style="margin-top: 8px; display: flex; justify-content: flex-end; gap: 8px;">
+      <button (click)="toggleReplyForm()"
+        style="padding: 6px 14px; background: white; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; cursor: pointer; color: #374151;">
+        Cancel
+      </button>
+      <button (click)="submitReply()"
+        [disabled]="!replyContent.trim() || postingReply"
+        [style.opacity]="!replyContent.trim() || postingReply ? '0.5' : '1'"
+        [style.cursor]="!replyContent.trim() || postingReply ? 'not-allowed' : 'pointer'"
+        style="padding: 6px 16px; background: #7c3aed; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+        {{ postingReply ? 'Posting...' : 'Post Reply' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Replies list -->
+  <div *ngIf="repliesVisible && replies.length > 0"
+    style="border-top: 1px solid #f3f4f6; background: #fafafa; padding: 8px 16px 12px 48px; display: flex; flex-direction: column; gap: 10px;">
+    <div *ngFor="let reply of replies; trackBy: trackById"
+      style="display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f3f4f6;">
+      <div [style.background]="getAvatarColor(reply.posterName)"
+        style="width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; flex-shrink: 0;">
+        {{ getInitials(reply.posterName) }}
+      </div>
+      <div style="flex: 1; min-width: 0;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;">
+          <span style="font-size: 13px; font-weight: 600; color: #111827;">{{ reply.posterName }}</span>
+          <span style="font-size: 12px; color: #9ca3af;">{{ formatTimestamp(reply.postedAt) }}</span>
+        </div>
+        <p style="margin: 0; font-size: 13px; color: #374151; line-height: 1.6; white-space: pre-wrap;">{{ reply.content }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="repliesError"
+    style="border-top: 1px solid #f3f4f6; padding: 10px 16px; font-size: 13px; color: #dc2626;">
+    {{ repliesError }}
+  </div>
+
+</div>

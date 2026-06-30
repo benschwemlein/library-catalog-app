@@ -1,0 +1,193 @@
+<div style="max-width: 1200px; margin: 0 auto; padding: 24px 16px;">
+
+  <!-- Header -->
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+    <div>
+      <h1 style="margin: 0; font-size: 1.75rem; font-weight: 700; color: #1f2937;">Community Reading Lists</h1>
+      <p style="margin: 4px 0 0; color: #6b7280; font-size: 0.95rem;">Discover and copy reading lists shared by library members</p>
+    </div>
+    <div style="position: relative;">
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        placeholder="Search lists..."
+        style="padding: 10px 16px 10px 40px; border: 1px solid #d1d5db; border-radius: 8px;
+               font-size: 0.95rem; outline: none; width: 260px; background: #fff; color: #1f2937;"
+      />
+      <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 1rem;">&#128269;</span>
+    </div>
+  </div>
+
+  <!-- Success banner -->
+  <div *ngIf="successMessage"
+       style="display: flex; align-items: center; justify-content: space-between;
+              background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px;
+              padding: 12px 16px; margin-bottom: 16px; color: #15803d;">
+    <span>&#10003; {{ successMessage }}</span>
+    <button (click)="dismissSuccess()"
+            style="background: none; border: none; cursor: pointer; color: #15803d; font-size: 1.1rem; padding: 0 4px;">&#215;</button>
+  </div>
+
+  <!-- Error banner -->
+  <div *ngIf="error"
+       style="display: flex; align-items: center; justify-content: space-between;
+              background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px;
+              padding: 12px 16px; margin-bottom: 16px; color: #dc2626;">
+    <span>&#9888; {{ error }}</span>
+    <button (click)="dismissError()"
+            style="background: none; border: none; cursor: pointer; color: #dc2626; font-size: 1.1rem; padding: 0 4px;">&#215;</button>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="loading"
+       style="display: flex; flex-direction: column; align-items: center; justify-content: center;
+              padding: 64px 0; color: #6b7280;">
+    <div style="width: 40px; height: 40px; border: 3px solid #e5e7eb; border-top-color: #6366f1;
+                border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px;"></div>
+    <span>Loading community lists...</span>
+  </div>
+
+  <!-- Results count -->
+  <div *ngIf="!loading && lists.length > 0"
+       style="margin-bottom: 16px; color: #6b7280; font-size: 0.875rem;">
+    Showing {{ filteredLists.length }} of {{ lists.length }} lists
+    <span *ngIf="searchQuery.trim()"> matching "{{ searchQuery }}"</span>
+  </div>
+
+  <!-- Card grid -->
+  <div *ngIf="!loading"
+       style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;">
+
+    <div *ngFor="let list of filteredLists"
+         style="background: #fff; border: 1px solid #e5e7eb; border-radius: 12px;
+                padding: 20px; display: flex; flex-direction: column; gap: 14px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.07); transition: box-shadow 0.2s;"
+         onmouseenter="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.12)'"
+         onmouseleave="this.style.boxShadow='0 1px 3px rgba(0,0,0,0.07)'">
+
+      <!-- Member avatar + name -->
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div [style.background]="getAvatarColor(list.memberName)"
+             style="width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center;
+                    justify-content: center; color: #fff; font-weight: 700; font-size: 0.9rem; flex-shrink: 0;">
+          {{ getMemberInitials(list.memberName) }}
+        </div>
+        <div>
+          <div style="font-weight: 600; color: #1f2937; font-size: 0.9rem;">{{ list.memberName }}</div>
+          <div style="font-size: 0.75rem; color: #9ca3af;">{{ list.createdDate | date:'mediumDate' }}</div>
+        </div>
+        <div style="margin-left: auto;">
+          <span style="background: #eff6ff; color: #3b82f6; font-size: 0.7rem; font-weight: 600;
+                       padding: 3px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em;">
+            {{ list.visibility }}
+          </span>
+        </div>
+      </div>
+
+      <!-- List name and description -->
+      <div>
+        <h3 style="margin: 0 0 6px; font-size: 1.05rem; font-weight: 700; color: #1f2937;">{{ list.name }}</h3>
+        <p *ngIf="list.description"
+           style="margin: 0; font-size: 0.875rem; color: #6b7280; line-height: 1.5;
+                  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+          {{ list.description }}
+        </p>
+        <p *ngIf="!list.description"
+           style="margin: 0; font-size: 0.875rem; color: #d1d5db; font-style: italic;">
+          No description provided.
+        </p>
+      </div>
+
+      <!-- Progress bar -->
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <span style="font-size: 0.8rem; color: #6b7280;">Reading progress</span>
+          <span style="font-size: 0.8rem; font-weight: 600; color: #374151;">{{ getProgressPercent(list) }}%</span>
+        </div>
+        <div style="background: #f3f4f6; border-radius: 99px; height: 6px; overflow: hidden;">
+          <div [style.width.%]="getProgressPercent(list)"
+               [style.background]="getProgressColor(getProgressPercent(list))"
+               style="height: 100%; border-radius: 99px; transition: width 0.4s ease;"></div>
+        </div>
+      </div>
+
+      <!-- Item count badges -->
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+        <span style="display: flex; align-items: center; gap: 4px; background: #f9fafb;
+                     border: 1px solid #e5e7eb; border-radius: 20px; padding: 4px 10px;
+                     font-size: 0.8rem; color: #374151; font-weight: 500;">
+          &#128218; {{ list.itemCount || 0 }} books
+        </span>
+        <span style="display: flex; align-items: center; gap: 4px; background: #f0fdf4;
+                     border: 1px solid #bbf7d0; border-radius: 20px; padding: 4px 10px;
+                     font-size: 0.8rem; color: #15803d; font-weight: 500;">
+          &#10003; {{ list.readCount || 0 }} read
+        </span>
+        <span *ngIf="list.itemCount && list.itemCount > list.readCount"
+              style="background: #fef3c7; border: 1px solid #fde68a; border-radius: 20px;
+                     padding: 4px 10px; font-size: 0.8rem; color: #92400e; font-weight: 500;">
+          {{ list.itemCount - list.readCount }} remaining
+        </span>
+      </div>
+
+      <!-- Copy button -->
+      <button (click)="copyList(list)"
+              style="margin-top: auto; width: 100%; padding: 10px; background: #6366f1; color: #fff;
+                     border: none; border-radius: 8px; font-size: 0.875rem; font-weight: 600;
+                     cursor: pointer; transition: background 0.2s;"
+              onmouseenter="this.style.background='#4f46e5'"
+              onmouseleave="this.style.background='#6366f1'">
+        + Copy to My Lists
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!loading && filteredLists.length === 0"
+       style="display: flex; flex-direction: column; align-items: center; justify-content: center;
+              padding: 80px 0; color: #9ca3af; text-align: center;">
+    <div style="font-size: 3rem; margin-bottom: 12px;">&#128218;</div>
+    <h3 style="margin: 0 0 8px; font-size: 1.15rem; font-weight: 600; color: #374151;">
+      {{ searchQuery.trim() ? 'No lists match your search' : 'No public lists yet' }}
+    </h3>
+    <p style="margin: 0; font-size: 0.9rem;">
+      {{ searchQuery.trim() ? 'Try a different search term.' : 'Community members have not shared any lists.' }}
+    </p>
+    <button *ngIf="searchQuery.trim()" (click)="searchQuery = ''"
+            style="margin-top: 16px; padding: 8px 20px; background: #6366f1; color: #fff;
+                   border: none; border-radius: 8px; font-size: 0.875rem; cursor: pointer;">
+      Clear Search
+    </button>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && totalPages > 1"
+       style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 32px;">
+    <button (click)="prevPage()" [disabled]="currentPage === 0"
+            style="padding: 8px 18px; border: 1px solid #d1d5db; border-radius: 8px; background: #fff;
+                   color: #374151; font-size: 0.875rem; cursor: pointer; font-weight: 500;
+                   opacity: 1; transition: opacity 0.2s;"
+            [style.opacity]="currentPage === 0 ? '0.4' : '1'"
+            [style.cursor]="currentPage === 0 ? 'not-allowed' : 'pointer'">
+      &#8592; Previous
+    </button>
+    <span style="font-size: 0.875rem; color: #6b7280;">
+      Page {{ currentPage + 1 }} of {{ totalPages }}
+    </span>
+    <button (click)="nextPage()" [disabled]="currentPage >= totalPages - 1"
+            style="padding: 8px 18px; border: 1px solid #d1d5db; border-radius: 8px; background: #fff;
+                   color: #374151; font-size: 0.875rem; cursor: pointer; font-weight: 500;"
+            [style.opacity]="currentPage >= totalPages - 1 ? '0.4' : '1'"
+            [style.cursor]="currentPage >= totalPages - 1 ? 'not-allowed' : 'pointer'">
+      Next &#8594;
+    </button>
+  </div>
+
+</div>
+
+<style>
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+</style>

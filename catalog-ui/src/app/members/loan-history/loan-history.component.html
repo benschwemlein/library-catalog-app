@@ -1,0 +1,42 @@
+<div class="loan-history-container">
+  <h2>Loan History</h2>
+
+  <div class="filters">
+    <label>Filter by Status:</label>
+    <select [(ngModel)]="statusFilter" (ngModelChange)="applyFilter()" class="form-input">
+      <option value="">All</option>
+      <option *ngFor="let s of statuses.slice(1)" [value]="s">{{ s }}</option>
+    </select>
+  </div>
+
+  <div *ngIf="loading" class="loading-spinner"><div class="spinner"></div></div>
+
+  <div *ngIf="!loading && filteredLoans.length === 0" class="empty-state">
+    <p>No loans found.</p>
+  </div>
+
+  <table *ngIf="!loading && filteredLoans.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Book Title</th>
+        <th>Branch</th>
+        <th>Checkout Date</th>
+        <th>Due Date</th>
+        <th>Return Date</th>
+        <th>Renewals</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let loan of filteredLoans" [class.overdue-row]="loan.status === 'OVERDUE'">
+        <td>{{ loan.bookTitle }}</td>
+        <td>{{ loan.branchName }}</td>
+        <td>{{ loan.checkoutDate | date:'mediumDate' }}</td>
+        <td [class.text-danger]="loan.status === 'OVERDUE'">{{ loan.dueDate | date:'mediumDate' }}</td>
+        <td>{{ loan.returnDate ? (loan.returnDate | date:'mediumDate') : '-' }}</td>
+        <td>{{ loan.renewalCount }}/{{ loan.maxRenewals }}</td>
+        <td><span class="badge" [ngClass]="getStatusClass(loan.status)">{{ loan.status }}</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

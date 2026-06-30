@@ -1,0 +1,227 @@
+<div style="max-width: 900px; margin: 0 auto; padding: 24px 16px;">
+
+  <!-- Header -->
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+    <div>
+      <h1 style="margin: 0; font-size: 1.75rem; font-weight: 700; color: #1f2937;">Interlibrary Loan Requests</h1>
+      <p style="margin: 4px 0 0; color: #6b7280; font-size: 0.95rem;">Request books from partner libraries when not available locally</p>
+    </div>
+    <button *ngIf="!showRequestForm" (click)="openForm()"
+            style="padding: 10px 20px; background: #6366f1; color: #fff; border: none;
+                   border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer;
+                   transition: background 0.2s;"
+            onmouseenter="this.style.background='#4f46e5'"
+            onmouseleave="this.style.background='#6366f1'">
+      + Request a Book
+    </button>
+  </div>
+
+  <!-- Success banner -->
+  <div *ngIf="successMessage"
+       style="display: flex; align-items: center; justify-content: space-between;
+              background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px;
+              padding: 12px 16px; margin-bottom: 16px; color: #15803d;">
+    <span>&#10003; {{ successMessage }}</span>
+    <button (click)="dismissSuccess()"
+            style="background: none; border: none; cursor: pointer; color: #15803d; font-size: 1.1rem; padding: 0 4px;">&#215;</button>
+  </div>
+
+  <!-- Error banner -->
+  <div *ngIf="error"
+       style="display: flex; align-items: center; justify-content: space-between;
+              background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px;
+              padding: 12px 16px; margin-bottom: 16px; color: #dc2626;">
+    <span>&#9888; {{ error }}</span>
+    <button (click)="dismissError()"
+            style="background: none; border: none; cursor: pointer; color: #dc2626; font-size: 1.1rem; padding: 0 4px;">&#215;</button>
+  </div>
+
+  <!-- Request form -->
+  <div *ngIf="showRequestForm"
+       style="background: #fff; border: 1px solid #e5e7eb; border-radius: 12px;
+              padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+    <h2 style="margin: 0 0 20px; font-size: 1.15rem; font-weight: 700; color: #1f2937;">
+      New Interlibrary Loan Request
+    </h2>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+
+      <!-- Book title (required) -->
+      <div style="grid-column: 1 / -1;">
+        <label style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 6px;">
+          Book Title <span style="color: #ef4444;">*</span>
+        </label>
+        <input type="text" [(ngModel)]="formData.bookTitle" placeholder="Enter book title"
+               style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px;
+                      font-size: 0.95rem; color: #1f2937; outline: none; box-sizing: border-box;"
+               [style.border-color]="!formData.bookTitle.trim() ? '#fca5a5' : '#d1d5db'" />
+        <span *ngIf="!formData.bookTitle.trim()"
+              style="font-size: 0.75rem; color: #ef4444; margin-top: 4px; display: block;">
+          Book title is required.
+        </span>
+      </div>
+
+      <!-- Author -->
+      <div>
+        <label style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 6px;">
+          Author Name
+        </label>
+        <input type="text" [(ngModel)]="formData.authorName" placeholder="e.g. Jane Doe"
+               style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px;
+                      font-size: 0.95rem; color: #1f2937; outline: none; box-sizing: border-box;" />
+      </div>
+
+      <!-- ISBN -->
+      <div>
+        <label style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 6px;">
+          ISBN
+        </label>
+        <input type="text" [(ngModel)]="formData.isbn" placeholder="e.g. 978-0-06-112008-4"
+               style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px;
+                      font-size: 0.95rem; color: #1f2937; outline: none; box-sizing: border-box;" />
+      </div>
+
+      <!-- Needed by date -->
+      <div style="grid-column: 1 / -1;">
+        <label style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 6px;">
+          Needed By Date
+        </label>
+        <input type="date" [(ngModel)]="formData.neededByDate"
+               style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px;
+                      font-size: 0.95rem; color: #1f2937; outline: none; box-sizing: border-box; max-width: 260px;" />
+      </div>
+
+      <!-- Notes -->
+      <div style="grid-column: 1 / -1;">
+        <label style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 6px;">
+          Notes
+        </label>
+        <textarea [(ngModel)]="formData.notes" placeholder="Any additional details (edition, format, etc.)"
+                  rows="3"
+                  style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px;
+                         font-size: 0.95rem; color: #1f2937; outline: none; resize: vertical;
+                         font-family: inherit; box-sizing: border-box;"></textarea>
+      </div>
+    </div>
+
+    <!-- Form actions -->
+    <div style="display: flex; gap: 12px; margin-top: 20px; justify-content: flex-end;">
+      <button (click)="cancelForm()"
+              style="padding: 10px 20px; background: #fff; color: #374151; border: 1px solid #d1d5db;
+                     border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer;">
+        Cancel
+      </button>
+      <button (click)="submitRequest()" [disabled]="!formData.bookTitle.trim()"
+              style="padding: 10px 24px; background: #6366f1; color: #fff; border: none;
+                     border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer;"
+              [style.opacity]="!formData.bookTitle.trim() ? '0.5' : '1'"
+              [style.cursor]="!formData.bookTitle.trim() ? 'not-allowed' : 'pointer'">
+        Submit Request
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="loading"
+       style="display: flex; flex-direction: column; align-items: center; padding: 64px 0; color: #6b7280;">
+    <div style="width: 36px; height: 36px; border: 3px solid #e5e7eb; border-top-color: #6366f1;
+                border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px;"></div>
+    <span>Loading your requests...</span>
+  </div>
+
+  <!-- Requests list -->
+  <div *ngIf="!loading && requests.length > 0"
+       style="display: flex; flex-direction: column; gap: 12px;">
+
+    <div *ngFor="let req of requests"
+         style="background: #fff; border: 1px solid #e5e7eb; border-radius: 12px;
+                padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
+
+      <!-- Row 1: Title + status -->
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; flex-wrap: wrap;">
+        <div>
+          <h3 style="margin: 0 0 4px; font-size: 1.05rem; font-weight: 700; color: #1f2937;">
+            {{ req.bookTitle }}
+          </h3>
+          <div *ngIf="req.authorName" style="font-size: 0.875rem; color: #6b7280;">
+            by {{ req.authorName }}
+          </div>
+        </div>
+        <span [style.background]="getStatusBgColor(req.status)"
+              [style.color]="getStatusColor(req.status)"
+              [style.border]="'1px solid ' + getStatusColor(req.status) + '4d'"
+              style="padding: 5px 12px; border-radius: 20px; font-size: 0.8rem;
+                     font-weight: 700; white-space: nowrap; flex-shrink: 0;">
+          {{ getStatusLabel(req.status) }}
+        </span>
+      </div>
+
+      <!-- Row 2: Metadata grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px 20px; margin-bottom: 10px;">
+        <div *ngIf="req.isbn">
+          <span style="font-size: 0.75rem; color: #9ca3af; display: block;">ISBN</span>
+          <span style="font-size: 0.875rem; color: #374151; font-family: monospace;">{{ req.isbn }}</span>
+        </div>
+        <div>
+          <span style="font-size: 0.75rem; color: #9ca3af; display: block;">Request Date</span>
+          <span style="font-size: 0.875rem; color: #374151;">{{ req.requestDate | date:'mediumDate' }}</span>
+        </div>
+        <div *ngIf="req.neededByDate">
+          <span style="font-size: 0.75rem; color: #9ca3af; display: block;">Needed By</span>
+          <span style="font-size: 0.875rem; color: #374151;">{{ req.neededByDate | date:'mediumDate' }}</span>
+        </div>
+        <div *ngIf="req.partnerLibraryName">
+          <span style="font-size: 0.75rem; color: #9ca3af; display: block;">Partner Library</span>
+          <span style="font-size: 0.875rem; color: #374151;">{{ req.partnerLibraryName }}</span>
+        </div>
+        <div *ngIf="req.estimatedArrival">
+          <span style="font-size: 0.75rem; color: #9ca3af; display: block;">Est. Arrival</span>
+          <span style="font-size: 0.875rem; color: #374151;">{{ req.estimatedArrival | date:'mediumDate' }}</span>
+        </div>
+      </div>
+
+      <!-- Available notice -->
+      <div *ngIf="isAvailable(req.status)"
+           style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px;
+                  padding: 10px 14px; font-size: 0.875rem; color: #15803d; margin-top: 8px;">
+        &#10003; This book is ready for pickup at your branch!
+      </div>
+
+      <!-- Denial reason -->
+      <div *ngIf="isDenied(req.status) && req.denialReason"
+           style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px;
+                  padding: 10px 14px; font-size: 0.875rem; color: #dc2626; margin-top: 8px;">
+        <span style="font-weight: 600;">Reason: </span>{{ req.denialReason }}
+      </div>
+
+      <!-- Review note -->
+      <div *ngIf="req.reviewNote && !isDenied(req.status)"
+           style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px;
+                  padding: 10px 14px; font-size: 0.875rem; color: #92400e; margin-top: 8px;">
+        <span style="font-weight: 600;">Note: </span>{{ req.reviewNote }}
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!loading && requests.length === 0 && !showRequestForm"
+       style="display: flex; flex-direction: column; align-items: center; justify-content: center;
+              padding: 80px 0; color: #9ca3af; text-align: center;">
+    <div style="font-size: 3rem; margin-bottom: 12px;">&#128211;</div>
+    <h3 style="margin: 0 0 8px; font-size: 1.15rem; font-weight: 600; color: #374151;">No requests yet</h3>
+    <p style="margin: 0 0 20px; font-size: 0.9rem;">You have not submitted any interlibrary loan requests.</p>
+    <button (click)="openForm()"
+            style="padding: 10px 24px; background: #6366f1; color: #fff; border: none;
+                   border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer;">
+      Request Your First Book
+    </button>
+  </div>
+
+</div>
+
+<style>
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+</style>

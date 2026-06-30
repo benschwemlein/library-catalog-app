@@ -1,0 +1,100 @@
+<div class="reports-container">
+  <h2>Reports</h2>
+
+  <div class="tabs">
+    <button (click)="setTab('most-borrowed')" [class.active]="activeTab === 'most-borrowed'" class="tab-btn">Most Borrowed</button>
+    <button (click)="setTab('overdue')" [class.active]="activeTab === 'overdue'" class="tab-btn">Overdue</button>
+    <button (click)="setTab('branch-stats')" [class.active]="activeTab === 'branch-stats'" class="tab-btn">Branch Stats</button>
+    <button (click)="setTab('member-activity')" [class.active]="activeTab === 'member-activity'" class="tab-btn">Member Activity</button>
+  </div>
+
+  <div *ngIf="loading" class="loading-spinner"><div class="spinner"></div></div>
+
+  <!-- Most Borrowed Tab -->
+  <div *ngIf="activeTab === 'most-borrowed' && !loading && mostBorrowedReport" class="report-section">
+    <div class="report-header">
+      <h3>Most Borrowed Books</h3>
+      <button (click)="exportReport('most-borrowed')" class="btn btn-secondary btn-sm">Export CSV</button>
+    </div>
+    <table class="table">
+      <thead><tr><th>Rank</th><th>Title</th><th>Author(s)</th><th>ISBN</th><th>Checkouts</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let book of mostBorrowedReport.books">
+          <td>{{ book.rank }}</td>
+          <td>{{ book.bookTitle }}</td>
+          <td>{{ book.authorNames.join(', ') }}</td>
+          <td>{{ book.isbn }}</td>
+          <td>{{ book.checkoutCount }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Overdue Tab -->
+  <div *ngIf="activeTab === 'overdue' && !loading && overdueReport" class="report-section">
+    <div class="report-header">
+      <h3>Overdue Loans</h3>
+      <span class="report-summary">Total: {{ overdueReport.totalOverdue }} items · Fines: {{ overdueReport.totalFineAmount | currency }}</span>
+      <button (click)="exportReport('overdue')" class="btn btn-secondary btn-sm">Export CSV</button>
+    </div>
+    <table class="table">
+      <thead><tr><th>Book</th><th>Member</th><th>Email</th><th>Due Date</th><th>Days Overdue</th><th>Fine</th><th>Branch</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let loan of overdueReport.loans">
+          <td>{{ loan.bookTitle }}</td>
+          <td>{{ loan.memberName }}</td>
+          <td>{{ loan.memberEmail }}</td>
+          <td>{{ loan.dueDate | date:'mediumDate' }}</td>
+          <td class="text-danger">{{ loan.daysOverdue }}</td>
+          <td>{{ loan.fineAmount | currency }}</td>
+          <td>{{ loan.branchName }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Branch Stats Tab -->
+  <div *ngIf="activeTab === 'branch-stats' && !loading && branchStatsReport" class="report-section">
+    <div class="report-header">
+      <h3>Branch Statistics</h3>
+      <button (click)="exportReport('branch-stats')" class="btn btn-secondary btn-sm">Export CSV</button>
+    </div>
+    <table class="table">
+      <thead><tr><th>Branch</th><th>Checkouts</th><th>Active Loans</th><th>Overdue</th><th>New Members</th><th>Events</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let branch of branchStatsReport.branches">
+          <td>{{ branch.branchName }}</td>
+          <td>{{ branch.totalCheckouts }}</td>
+          <td>{{ branch.activeLoans }}</td>
+          <td class="text-danger">{{ branch.overdueLoans }}</td>
+          <td>{{ branch.newMembers }}</td>
+          <td>{{ branch.eventsHeld }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Member Activity Tab -->
+  <div *ngIf="activeTab === 'member-activity' && !loading && memberActivityReport" class="report-section">
+    <div class="report-header">
+      <h3>Member Activity</h3>
+      <span>Period: {{ memberActivityReport.period }} · Active: {{ memberActivityReport.activeMembers }}/{{ memberActivityReport.totalMembers }}</span>
+      <button (click)="exportReport('member-activity')" class="btn btn-secondary btn-sm">Export CSV</button>
+    </div>
+    <table class="table">
+      <thead><tr><th>Member #</th><th>Name</th><th>Tier</th><th>Total Loans</th><th>Active</th><th>Total Fines</th><th>Unpaid</th><th>Last Activity</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let entry of memberActivityReport.entries">
+          <td>{{ entry.membershipNumber }}</td>
+          <td>{{ entry.memberName }}</td>
+          <td>{{ entry.membershipTier }}</td>
+          <td>{{ entry.totalLoans }}</td>
+          <td>{{ entry.activeLoans }}</td>
+          <td>{{ entry.totalFines | currency }}</td>
+          <td [class.text-danger]="entry.unpaidFines > 0">{{ entry.unpaidFines | currency }}</td>
+          <td>{{ entry.lastActivity | date:'mediumDate' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

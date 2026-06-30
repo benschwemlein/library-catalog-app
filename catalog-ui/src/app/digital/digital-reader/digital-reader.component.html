@@ -1,0 +1,141 @@
+<div style="padding: 24px; max-width: 860px; margin: 0 auto; font-family: system-ui, sans-serif;">
+
+  <!-- Loading -->
+  <div *ngIf="loading" style="display: flex; align-items: center; justify-content: center; padding: 100px 0; gap: 12px;">
+    <div style="width: 36px; height: 36px; border: 3px solid #e5e7eb; border-top-color: #4f46e5; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+    <span style="color: #6b7280; font-size: 16px;">Loading resource...</span>
+    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading && !resource"
+    style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; padding: 20px; text-align: center;">
+    <div style="font-size: 32px; margin-bottom: 8px;">⚠️</div>
+    <div style="font-weight: 600; color: #991b1b; font-size: 16px;">{{ error }}</div>
+  </div>
+
+  <!-- Resource detail -->
+  <div *ngIf="resource && !loading">
+
+    <!-- Success / error banners -->
+    <div *ngIf="successMessage"
+      style="background: #ecfdf5; border: 1px solid #6ee7b7; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 18px;">✅</span>
+      <span style="color: #065f46; font-size: 14px; font-weight: 500;">{{ successMessage }}</span>
+    </div>
+    <div *ngIf="error"
+      style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 18px;">❌</span>
+      <span style="color: #991b1b; font-size: 14px; font-weight: 500;">{{ error }}</span>
+    </div>
+
+    <!-- Hero section -->
+    <div style="background: white; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; margin-bottom: 24px;">
+      <div style="display: flex; gap: 0; flex-wrap: wrap;">
+
+        <!-- Cover -->
+        <div style="width: 220px; min-height: 280px; background: linear-gradient(135deg, #4f46e5, #7c3aed); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; box-sizing: border-box; flex-shrink: 0;">
+          <span style="font-size: 72px; line-height: 1;">{{ getTypeIcon() }}</span>
+          <div style="text-align: center;">
+            <div style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1px;">{{ resource.resourceType }}</div>
+            <div style="font-size: 13px; color: rgba(255,255,255,0.85); margin-top: 4px;">{{ resource.format }}</div>
+          </div>
+          <div *ngIf="resource.availableNow"
+            style="background: #10b981; color: white; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
+            Available
+          </div>
+          <div *ngIf="!resource.availableNow"
+            style="background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.75); font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 12px;">
+            {{ resource.activeLoans }} Active Loan{{ resource.activeLoans !== 1 ? 's' : '' }}
+          </div>
+        </div>
+
+        <!-- Info -->
+        <div style="flex: 1; padding: 28px; min-width: 0;">
+          <h1 style="margin: 0 0 6px; font-size: 24px; font-weight: 700; color: #111827; line-height: 1.3;">
+            {{ resource.title }}
+          </h1>
+          <div style="font-size: 14px; color: #6b7280; margin-bottom: 16px;">
+            {{ resource.publisher }}<span *ngIf="resource.publicationYear"> · {{ resource.publicationYear }}</span>
+            <span *ngIf="resource.isbn"> · ISBN {{ resource.isbn }}</span>
+          </div>
+
+          <!-- Meta tags -->
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;">
+            <span style="background: #eff6ff; color: #1d4ed8; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 10px;">
+              {{ resource.format }}
+            </span>
+            <span *ngIf="resource.language"
+              style="background: #f3f4f6; color: #374151; font-size: 12px; padding: 4px 10px; border-radius: 10px;">
+              {{ resource.language | uppercase }}
+            </span>
+            <span style="background: #faf5ff; color: #7c3aed; font-size: 12px; padding: 4px 10px; border-radius: 10px;">
+              {{ resource.licenseType === 'SINGLE_USER' ? 'Single User' : resource.licenseType === 'MULTI_USER' ? 'Multi User' : 'Unlimited' }}
+            </span>
+            <span *ngIf="resource.maxConcurrentUsers"
+              style="background: #fff7ed; color: #c2410c; font-size: 12px; padding: 4px 10px; border-radius: 10px;">
+              Max {{ resource.maxConcurrentUsers }} users
+            </span>
+          </div>
+
+          <!-- Description -->
+          <p style="font-size: 14px; color: #4b5563; line-height: 1.7; margin: 0 0 20px;">
+            {{ resource.description }}
+          </p>
+
+          <!-- File info -->
+          <div style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 13px; color: #6b7280; margin-bottom: 24px;">
+            <span>💾 {{ formatFileSize(resource.fileSizeBytes) }}</span>
+            <span *ngIf="resource.durationMinutes">⏱️ {{ resource.durationMinutes }} minutes</span>
+          </div>
+
+          <!-- Action buttons -->
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+
+            <!-- No active loan — show checkout -->
+            <ng-container *ngIf="!loan">
+              <button (click)="checkout()" [disabled]="!resource.availableNow || checkoutLoading"
+                [style.background]="resource.availableNow ? '#4f46e5' : '#9ca3af'"
+                [style.cursor]="resource.availableNow ? 'pointer' : 'not-allowed'"
+                style="padding: 12px 28px; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 600;">
+                <span *ngIf="!checkoutLoading">Checkout Resource</span>
+                <span *ngIf="checkoutLoading">Checking out...</span>
+              </button>
+              <div *ngIf="!resource.availableNow" style="font-size: 13px; color: #d97706; align-self: center; font-weight: 500;">
+                ⚠️ All copies currently in use
+              </div>
+            </ng-container>
+
+            <!-- Active loan — show access & return -->
+            <ng-container *ngIf="loan">
+              <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 10px; padding: 14px 18px; flex: 1; min-width: 200px;">
+                <div style="font-size: 12px; font-weight: 600; color: #065f46; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Active Loan</div>
+                <div style="font-size: 13px; color: #047857;">
+                  Expires: <strong>{{ loan.expiryDate | date:'mediumDate' }}</strong>
+                </div>
+                <div *ngIf="isExpiringSoon()" style="font-size: 12px; color: #d97706; margin-top: 4px; font-weight: 500;">
+                  ⚠️ Expiring soon — renew or save your progress
+                </div>
+                <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
+                  Downloads: {{ loan.downloadCount }}
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <button (click)="trackDownload()" [disabled]="downloadLoading"
+                  style="padding: 10px 20px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                  {{ downloadLoading ? 'Preparing...' : '⬇️ Access Resource' }}
+                </button>
+                <button (click)="returnResource()" [disabled]="returnLoading"
+                  style="padding: 10px 20px; background: white; color: #dc2626; border: 1px solid #fecaca; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer;">
+                  {{ returnLoading ? 'Returning...' : 'Return' }}
+                </button>
+              </div>
+            </ng-container>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

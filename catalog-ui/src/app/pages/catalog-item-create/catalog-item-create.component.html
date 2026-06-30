@@ -1,0 +1,103 @@
+<div class="catalog-item-create-container form-container">
+  <form [formGroup]="catalogItemForm" (ngSubmit)="createCatalogItem()">
+    <div *ngIf="toastMessage" class="toast-message">{{ toastMessage }}</div>
+    <!-- Title Section -->
+    <div class="form-group mb-4">
+      <!-- Increased bottom margin -->
+      <label for="title">Title</label>
+      <input
+        type="text"
+        id="title"
+        class="form-control"
+        formControlName="title"
+        required
+      />
+      <!-- Validation Message -->
+      <div
+        *ngIf="
+          catalogItemForm.get('title')?.invalid &&
+          catalogItemForm.get('title')?.touched
+        "
+      >
+        Title is required.
+      </div>
+    </div>
+
+    <!-- Description Section -->
+    <div class="form-group mb-4">
+      <!-- Increased bottom margin -->
+      <label for="description">Description</label>
+      <textarea
+        id="description"
+        class="form-control"
+        formControlName="description"
+        required
+      ></textarea>
+      <!-- Validation Message -->
+      <div
+        *ngIf="
+          catalogItemForm.get('description')?.invalid &&
+          catalogItemForm.get('description')?.touched
+        "
+      >
+        Description is required.
+      </div>
+    </div>
+
+    <!-- Catalog ID Section -->
+    <div class="card mb-4">
+      <!-- Increased bottom margin -->
+      <div class="card-header">Catalog IDs</div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <!-- Select Catalog ID Type -->
+          <div class="col">
+            <label for="catalogIdType">Type</label>
+            <select
+              id="catalogIdType"
+              formControlName="catalogIdType"
+              class="form-select"
+            >
+              <option value="" disabled>Select a type</option>
+              <option *ngFor="let type of catalogIdTypes" [ngValue]="type">
+                {{ type.name }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Input Catalog ID Value -->
+          <div class="col">
+            <label for="catalogIdValue">Value</label>
+            <input
+              id="catalogIdValue"
+              formControlName="catalogIdValue"
+              class="form-control"
+              type="text"
+            />
+          </div>
+        </div>
+
+        <!-- Add Catalog ID Pair Button -->
+        <div class="mb-3">
+          <button
+            type="button"
+            (click)="addCatalogIdPair()"
+            class="btn btn-secondary"
+          >
+            Add Catalog ID
+          </button>
+        </div>
+
+        <!-- Catalog ID Pairs List -->
+        <ul class="list-unstyled">
+          <li *ngFor="let pair of catalogIdPairs">
+            {{ pair.type.name }}: {{ pair.value }}
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="btn btn-success">Create Catalog Item</button>
+  </form>
+</div>

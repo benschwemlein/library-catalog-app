@@ -1,0 +1,58 @@
+<div class="branch-detail-page">
+  <a routerLink="/branches" class="back-link">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    All Branches
+  </a>
+  <div *ngIf="loading" class="loading-spinner"><div class="spinner"></div></div>
+  <div *ngIf="!loading && branch" class="branch-content animate-in">
+    <div class="branch-header-card">
+      <div class="branch-icon-wrap">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <div class="branch-header-info">
+        <h1 class="branch-name">{{ branch.name }}</h1>
+        <div class="branch-contact-row">
+          <span class="contact-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>{{ branch.address }}, {{ branch.city }}, {{ branch.state }} {{ branch.zipCode }}</span>
+          <span class="contact-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.1 19.79 19.79 0 0 1 1.62 4.43 2 2 0 0 1 3.42 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.08 6.08l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>{{ branch.phone }}</span>
+          <span class="contact-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>{{ branch.email }}</span>
+        </div>
+      </div>
+      <span class="status-badge" [class.badge-open]="isOpenNow(branch)" [class.badge-closed]="!isOpenNow(branch)">{{ isOpenNow(branch) ? 'Open Now' : 'Closed' }}</span>
+    </div>
+    <div *ngIf="stats" class="stats-row">
+      <div class="stat-card"><div class="stat-value">{{ stats.totalCheckouts }}</div><div class="stat-label">Total Checkouts</div></div>
+      <div class="stat-card"><div class="stat-value">{{ stats.activeLoans }}</div><div class="stat-label">Active Loans</div></div>
+      <div class="stat-card stat-warn"><div class="stat-value">{{ stats.overdueLoans }}</div><div class="stat-label">Overdue</div></div>
+      <div class="stat-card"><div class="stat-value">{{ stats.activeHolds }}</div><div class="stat-label">Active Holds</div></div>
+    </div>
+    <div class="detail-columns">
+      <div class="detail-panel">
+        <h2 class="panel-heading">Hours of Operation</h2>
+        <table class="hours-table">
+          <tbody>
+            <tr *ngFor="let h of branch.hours">
+              <td class="day-cell">{{ h.dayOfWeek }}</td>
+              <td class="time-cell" [class.closed-day]="h.closed">{{ h.closed ? 'Closed' : h.openTime + ' – ' + h.closeTime }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="detail-panel">
+        <h2 class="panel-heading">Inventory Sample</h2>
+        <div *ngIf="inventoryLoading" class="loading-spinner"><div class="spinner"></div></div>
+        <table *ngIf="!inventoryLoading && inventory.length > 0" class="inv-table">
+          <thead><tr><th>Barcode</th><th>Title</th><th>Condition</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let copy of inventory">
+              <td class="td-mono">{{ copy.barcode }}</td>
+              <td class="td-title-cell">{{ copy.bookTitle }}</td>
+              <td>{{ copy.condition }}</td>
+              <td><span class="status-chip" [class.chip-ok]="copy.status === 'AVAILABLE'" [class.chip-warn]="copy.status !== 'AVAILABLE'">{{ copy.status }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <p *ngIf="!inventoryLoading && inventory.length === 0" class="empty-note">No inventory loaded.</p>
+      </div>
+    </div>
+  </div>
+</div>

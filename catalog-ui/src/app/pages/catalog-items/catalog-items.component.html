@@ -1,0 +1,53 @@
+<!-- catalog-items.component.html -->
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Title</th>
+      <th scope="col">Description</th>
+      <th scope="col">Catalog IDs</th>
+      <th scope="col">Created By</th>
+      <th scope="col">Checkout</th>
+    </tr>
+  </thead>
+  <tbody *ngIf="catalogItems$ | async as catalogItems">
+    <tr *ngFor="let item of catalogItems; index as i">
+      <th scope="row">{{ i + 1 }}</th>
+      <td>{{ item.title }}</td>
+      <td>{{ item.description }}</td>
+      <td>
+        <ul>
+          <li *ngFor="let catalogId of item.catalogIds">
+            {{ catalogId.value }} ({{ catalogId.type?.name }})
+          </li>
+        </ul>
+      </td>
+      <td>{{ item.createdBy?.firstName }} {{ item.createdBy?.lastName }}</td>
+
+      <td>
+        <ng-container *ngIf="item.checkout; else checkInIcon">
+          <!-- Icon for when the item is checked out -->
+          <i
+            (click)="checkinItem(item)"
+            class="fas fa-times-circle"
+            title="Check in"
+          >
+          </i>
+          {{ item.checkout?.checkedoutBy?.firstName }}
+          {{ item.checkout?.checkedoutBy?.lastName }}
+        </ng-container>
+        <ng-template #checkInIcon>
+          <!-- Icon for when the item is available for checkout -->
+          <i
+            (click)="checkoutItem(item)"
+            class="fas fa-check-circle"
+            title="Check out"
+          >
+          </i>
+        </ng-template>
+      </td>
+
+      <!-- ... other table code ... -->
+    </tr>
+  </tbody>
+</table>

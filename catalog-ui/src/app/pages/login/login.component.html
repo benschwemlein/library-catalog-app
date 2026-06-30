@@ -1,0 +1,58 @@
+<div class="auth-page">
+  <div class="form-container">
+
+    <div class="brand-mark">
+      <div class="brand-icon">📚</div>
+      <span class="brand-name">City Library</span>
+    </div>
+
+    <h2>Welcome back</h2>
+    <p class="subtitle">Sign in to access your library account</p>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+      <div *ngIf="toastMessage" class="toast-message">
+        <span>⚠</span> {{ toastMessage }}
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email address</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          placeholder="you@example.com"
+          [class.is-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+        />
+        <div *ngIf="loginForm.get('email')?.errors?.['required'] && loginForm.get('email')?.touched" class="invalid-feedback">
+          Email is required.
+        </div>
+        <div *ngIf="loginForm.get('email')?.errors?.['email'] && loginForm.get('email')?.touched" class="invalid-feedback">
+          Please enter a valid email.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          placeholder="••••••••"
+          [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+        />
+        <div *ngIf="loginForm.get('password')?.errors?.['required'] && loginForm.get('password')?.touched" class="invalid-feedback">
+          Password is required.
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid">
+        Sign in
+      </button>
+    </form>
+
+    <div class="form-footer">
+      Don't have an account? <a routerLink="/register">Create one</a>
+    </div>
+
+  </div>
+</div>

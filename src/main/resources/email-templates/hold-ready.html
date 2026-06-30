@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Hold Is Ready for Pickup</title>
+</head>
+<body style="margin:0;padding:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;background-color:#f4f6f9;color:#333333;">
+  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color:#f4f6f9;">
+    <tr>
+      <td align="center" style="padding:40px 20px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" width="600" style="max-width:600px;background-color:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+
+          <!-- Header -->
+          <tr>
+            <td style="background-color:#1a73e8;padding:32px 40px;text-align:center;">
+              <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:700;letter-spacing:-0.5px;">
+                City Public Library
+              </h1>
+              <p style="margin:8px 0 0;color:#d0e4ff;font-size:13px;text-transform:uppercase;letter-spacing:1.5px;">
+                Hold Notification
+              </p>
+            </td>
+          </tr>
+
+          <!-- Good news banner -->
+          <tr>
+            <td style="background-color:#e8f4fd;padding:24px 40px;border-bottom:1px solid #d0e4ff;">
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td width="40" valign="middle" style="padding-right:16px;">
+                    <div style="width:36px;height:36px;background-color:#1a73e8;border-radius:50%;text-align:center;line-height:36px;color:white;font-size:20px;">&#x2714;</div>
+                  </td>
+                  <td valign="middle">
+                    <p style="margin:0;font-size:16px;font-weight:600;color:#1a73e8;">Good news, {{memberName}}!</p>
+                    <p style="margin:4px 0 0;font-size:14px;color:#555;">Your hold is ready for pickup.</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:32px 40px;">
+              <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#444;">
+                The item you placed on hold is now available at your selected branch. Please collect it 
+                before the hold expires — after that, your hold will be cancelled and the item returned 
+                to general circulation.
+              </p>
+
+              <!-- Book details box -->
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%"
+                     style="background-color:#f8f9fa;border-radius:6px;border:1px solid #e0e0e0;margin-bottom:24px;">
+                <tr>
+                  <td style="padding:20px 24px;">
+                    <h2 style="margin:0 0 4px;font-size:18px;color:#1a1a1a;">{{bookTitle}}</h2>
+                    <p style="margin:0 0 16px;font-size:13px;color:#777;">by {{authorName}}</p>
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td style="padding:6px 0;border-top:1px solid #e8e8e8;">
+                          <span style="font-size:13px;color:#888;display:inline-block;width:140px;">Pickup Branch</span>
+                          <span style="font-size:13px;font-weight:600;color:#333;">{{branchName}}</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:6px 0;border-top:1px solid #e8e8e8;">
+                          <span style="font-size:13px;color:#888;display:inline-block;width:140px;">Pickup By</span>
+                          <span style="font-size:13px;font-weight:600;color:#d32f2f;">{{expiryDate}}</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:6px 0;border-top:1px solid #e8e8e8;">
+                          <span style="font-size:13px;color:#888;display:inline-block;width:140px;">Your Membership #</span>
+                          <span style="font-size:13px;font-weight:600;color:#333;">{{membershipNumber}}</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Branch address -->
+              <p style="margin:0 0 8px;font-size:14px;color:#444;">
+                <strong>Branch Address:</strong> {{branchAddress}}
+              </p>
+              <p style="margin:0 0 32px;font-size:13px;color:#777;">
+                <strong>Hours:</strong> {{branchHours}}
+              </p>
+
+              <!-- CTA -->
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td align="center">
+                    <a href="{{libraryUrl}}/my-holds"
+                       style="display:inline-block;padding:14px 32px;background-color:#1a73e8;color:#ffffff;
+                              text-decoration:none;border-radius:6px;font-size:15px;font-weight:600;">
+                      View My Holds
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color:#f4f6f9;padding:24px 40px;border-top:1px solid #e0e0e0;text-align:center;">
+              <p style="margin:0 0 8px;font-size:12px;color:#888;">
+                City Public Library &bull; 123 Main Street, Cityville &bull; (555) 100-0001
+              </p>
+              <p style="margin:0;font-size:12px;color:#aaa;">
+                You received this email because you have an active hold at City Public Library.<br/>
+                <a href="{{unsubscribeUrl}}" style="color:#1a73e8;text-decoration:none;">Manage email preferences</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

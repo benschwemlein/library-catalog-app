@@ -1,0 +1,234 @@
+<div style="padding: 24px; font-family: sans-serif; background: #f8fafc; min-height: 100vh;">
+
+  <h1 style="margin: 0 0 20px; font-size: 1.75rem; font-weight: 700; color: #1e293b;">Interlibrary Loan Management</h1>
+
+  <!-- Stats Bar -->
+  <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; gap: 8px; background: #fef3c7; border: 1px solid #fde68a; border-radius: 8px; padding: 10px 18px;">
+      <span style="font-size: 1.25rem; font-weight: 700; color: #92400e;">{{ pendingCount }}</span>
+      <span style="font-size: .8rem; color: #92400e; font-weight: 600;">Pending</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; background: #dbeafe; border: 1px solid #93c5fd; border-radius: 8px; padding: 10px 18px;">
+      <span style="font-size: 1.25rem; font-weight: 700; color: #1e40af;">{{ approvedCount }}</span>
+      <span style="font-size: .8rem; color: #1e40af; font-weight: 600;">Approved</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; background: #ede9fe; border: 1px solid #c4b5fd; border-radius: 8px; padding: 10px 18px;">
+      <span style="font-size: 1.25rem; font-weight: 700; color: #5b21b6;">{{ orderedCount }}</span>
+      <span style="font-size: .8rem; color: #5b21b6; font-weight: 600;">Ordered</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; background: #dcfce7; border: 1px solid #86efac; border-radius: 8px; padding: 10px 18px;">
+      <span style="font-size: 1.25rem; font-weight: 700; color: #166534;">{{ availableCount }}</span>
+      <span style="font-size: .8rem; color: #166534; font-weight: 600;">Available</span>
+    </div>
+    <span *ngIf="loading" style="align-self: center; color: #6b7280; font-size: .875rem;">Loading...</span>
+  </div>
+
+  <!-- Tab Bar -->
+  <div style="display: flex; gap: 0; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0;">
+    <button (click)="onTabChange('pending')"
+            [style.border-bottom]="activeTab === 'pending' ? '2px solid #3b82f6' : '2px solid transparent'"
+            [style.color]="activeTab === 'pending' ? '#3b82f6' : '#64748b'"
+            [style.font-weight]="activeTab === 'pending' ? '700' : '400'"
+            style="padding: 10px 24px; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-size: .9rem; margin-bottom: -2px; transition: color .15s;">
+      Pending Review
+    </button>
+    <button (click)="onTabChange('all')"
+            [style.border-bottom]="activeTab === 'all' ? '2px solid #3b82f6' : '2px solid transparent'"
+            [style.color]="activeTab === 'all' ? '#3b82f6' : '#64748b'"
+            [style.font-weight]="activeTab === 'all' ? '700' : '400'"
+            style="padding: 10px 24px; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-size: .9rem; margin-bottom: -2px; transition: color .15s;">
+      All Requests
+    </button>
+  </div>
+
+  <!-- Error / Success Banners -->
+  <div *ngIf="error" style="background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;">
+    {{ error }}
+  </div>
+  <div *ngIf="successMessage" style="background: #dcfce7; color: #166534; border: 1px solid #86efac; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;">
+    {{ successMessage }}
+  </div>
+
+  <!-- Two-Panel Layout -->
+  <div style="display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start;">
+
+    <!-- Left: Request List -->
+    <div style="background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.07); overflow: hidden;">
+      <div style="padding: 14px 16px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; font-weight: 700; color: #374151;">
+        Requests ({{ displayedRequests.length }})
+      </div>
+      <div style="max-height: 65vh; overflow-y: auto;">
+        <div *ngFor="let req of displayedRequests"
+             (click)="selectRequest(req)"
+             [style.background]="selectedRequest?.id === req.id ? '#eff6ff' : '#fff'"
+             [style.border-left]="selectedRequest?.id === req.id ? '4px solid #3b82f6' : '4px solid transparent'"
+             style="padding: 14px 16px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: background .15s;">
+          <div style="font-weight: 600; color: #1e293b; font-size: .9rem; margin-bottom: 4px;">{{ req.bookTitle }}</div>
+          <div style="color: #64748b; font-size: .8rem; margin-bottom: 6px;">{{ req.requestingMemberName }}</div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: .75rem; color: #94a3b8;">
+              <span>Req: {{ req.requestDate | date:'shortDate' }}</span>
+              <span *ngIf="req.neededByDate" style="margin-left: 8px;">Need by: {{ req.neededByDate | date:'shortDate' }}</span>
+            </div>
+            <span [style.background]="getStatusColor(req.status) + '22'"
+                  [style.color]="getStatusColor(req.status)"
+                  style="font-size: .7rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; text-transform: uppercase;">
+              {{ getStatusLabel(req.status) }}
+            </span>
+          </div>
+        </div>
+        <div *ngIf="displayedRequests.length === 0 && !loading"
+             style="padding: 32px 16px; text-align: center; color: #94a3b8; font-size: .875rem;">
+          No requests found.
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Detail Panel -->
+    <div>
+      <!-- Placeholder -->
+      <div *ngIf="!selectedRequest"
+           style="background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.07); padding: 60px 32px; text-align: center;">
+        <div style="font-size: 2.5rem; margin-bottom: 12px;">📚</div>
+        <div style="color: #94a3b8; font-size: 1rem;">Select a request to take action</div>
+      </div>
+
+      <!-- Detail Content -->
+      <div *ngIf="selectedRequest"
+           style="background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.07); padding: 24px;">
+
+        <!-- Header -->
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; gap: 12px;">
+          <h2 style="margin: 0; font-size: 1.2rem; color: #1e293b; line-height: 1.4;">{{ selectedRequest.bookTitle }}</h2>
+          <span [style.background]="getStatusColor(selectedRequest.status) + '22'"
+                [style.color]="getStatusColor(selectedRequest.status)"
+                style="font-size: .85rem; font-weight: 700; padding: 5px 14px; border-radius: 999px; text-transform: uppercase; white-space: nowrap; letter-spacing: .05em;">
+            {{ getStatusLabel(selectedRequest.status) }}
+          </span>
+        </div>
+
+        <!-- Book + Member Info -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+          <div style="background: #f8fafc; border-radius: 8px; padding: 14px;">
+            <div style="font-weight: 700; color: #374151; margin-bottom: 8px; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em;">Book Info</div>
+            <div style="font-size: .875rem; color: #475569; line-height: 1.7;">
+              <div *ngIf="selectedRequest.authorName"><span style="color: #94a3b8;">Author:</span> {{ selectedRequest.authorName }}</div>
+              <div *ngIf="selectedRequest.isbn"><span style="color: #94a3b8;">ISBN:</span> {{ selectedRequest.isbn }}</div>
+              <div *ngIf="!selectedRequest.authorName && !selectedRequest.isbn" style="color: #94a3b8;">No additional info</div>
+            </div>
+          </div>
+          <div style="background: #f8fafc; border-radius: 8px; padding: 14px;">
+            <div style="font-weight: 700; color: #374151; margin-bottom: 8px; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em;">Member Info</div>
+            <div style="font-size: .875rem; color: #475569; line-height: 1.7;">
+              <div><span style="color: #94a3b8;">Member:</span> {{ selectedRequest.requestingMemberName }}</div>
+              <div><span style="color: #94a3b8;">Branch ID:</span> {{ selectedRequest.requestingBranchId }}</div>
+              <div *ngIf="selectedRequest.neededByDate"><span style="color: #94a3b8;">Needed by:</span> {{ selectedRequest.neededByDate | date:'mediumDate' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Partner Library (if set) -->
+        <div *ngIf="selectedRequest.partnerLibraryName"
+             style="background: #ede9fe; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; font-size: .875rem; color: #5b21b6;">
+          <strong>Partner Library:</strong> {{ selectedRequest.partnerLibraryName }}
+          <span *ngIf="selectedRequest.estimatedArrival" style="margin-left: 12px; color: #7c3aed;">
+            Est. Arrival: {{ selectedRequest.estimatedArrival | date:'mediumDate' }}
+          </span>
+        </div>
+
+        <!-- Review Note (always visible) -->
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; font-size: .8rem; font-weight: 600; color: #64748b; margin-bottom: 4px;">Review Note</label>
+          <textarea [(ngModel)]="reviewNote"
+                    rows="2"
+                    placeholder="Add a note for this action..."
+                    style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: .875rem; resize: vertical; box-sizing: border-box;"></textarea>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+
+          <!-- Approve -->
+          <div *ngIf="canApprove(selectedRequest)" style="display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap;">
+            <button (click)="approveRequest(selectedRequest)"
+                    style="padding: 9px 22px; background: #22c55e; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: .875rem;">
+              Approve
+            </button>
+
+            <!-- Deny toggle -->
+            <button (click)="showDenialForm = !showDenialForm"
+                    style="padding: 9px 22px; background: #ef4444; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: .875rem;">
+              Deny
+            </button>
+          </div>
+
+          <!-- Denial Form -->
+          <div *ngIf="showDenialForm && canApprove(selectedRequest)"
+               style="background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 14px;">
+            <label style="display: block; font-size: .8rem; font-weight: 600; color: #991b1b; margin-bottom: 4px;">Denial Reason</label>
+            <textarea [(ngModel)]="denialReason"
+                      rows="2"
+                      placeholder="Reason for denial..."
+                      style="width: 100%; padding: 8px 10px; border: 1px solid #fca5a5; border-radius: 6px; font-size: .875rem; resize: vertical; box-sizing: border-box; margin-bottom: 10px;"></textarea>
+            <button (click)="denyRequest(selectedRequest)"
+                    style="padding: 8px 20px; background: #ef4444; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: .875rem;">
+              Confirm Deny
+            </button>
+          </div>
+
+          <!-- Partner Order -->
+          <div *ngIf="canOrder(selectedRequest)"
+               style="background: #f5f3ff; border: 1px solid #c4b5fd; border-radius: 8px; padding: 14px;">
+            <label style="display: block; font-size: .8rem; font-weight: 600; color: #5b21b6; margin-bottom: 6px;">Select Partner Library</label>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+              <select [(ngModel)]="partnerSelectId"
+                      style="flex: 1; padding: 8px 10px; border: 1px solid #c4b5fd; border-radius: 6px; font-size: .875rem; background: #fff; min-width: 180px;">
+                <option [ngValue]="null">-- Select a partner --</option>
+                <option *ngFor="let p of partners" [ngValue]="p.id">{{ p.name }} ({{ p.city }}, {{ p.state }})</option>
+              </select>
+              <button (click)="orderFromPartner(selectedRequest)"
+                      [disabled]="!partnerSelectId"
+                      [style.opacity]="!partnerSelectId ? '0.5' : '1'"
+                      style="padding: 9px 20px; background: #8b5cf6; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: .875rem;">
+                Order from Partner
+              </button>
+            </div>
+          </div>
+
+          <!-- Mark Received -->
+          <button *ngIf="canMarkReceived(selectedRequest)"
+                  (click)="markReceived(selectedRequest)"
+                  style="padding: 9px 22px; background: #06b6d4; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: .875rem; align-self: flex-start;">
+            Mark Received
+          </button>
+
+          <!-- Mark Available -->
+          <button *ngIf="canMarkAvailable(selectedRequest)"
+                  (click)="markAvailable(selectedRequest)"
+                  style="padding: 9px 22px; background: #22c55e; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: .875rem; align-self: flex-start;">
+            Mark Available for Pickup
+          </button>
+
+          <!-- Process Return -->
+          <button *ngIf="canReturn(selectedRequest)"
+                  (click)="processReturn(selectedRequest)"
+                  style="padding: 9px 22px; background: #6b7280; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: .875rem; align-self: flex-start;">
+            Process Return
+          </button>
+
+        </div>
+
+        <!-- Notes from record -->
+        <div *ngIf="selectedRequest.notes || selectedRequest.denialReason"
+             style="margin-top: 20px; background: #f8fafc; border-radius: 8px; padding: 14px; font-size: .875rem; color: #475569;">
+          <div *ngIf="selectedRequest.notes"><span style="color: #94a3b8;">Notes:</span> {{ selectedRequest.notes }}</div>
+          <div *ngIf="selectedRequest.denialReason" style="margin-top: 4px; color: #991b1b;">
+            <span style="color: #94a3b8;">Denial Reason:</span> {{ selectedRequest.denialReason }}
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
