@@ -1,5 +1,6 @@
 package com.example.library.service;
 
+import com.example.library.annotation.AuditableOperation;
 import com.example.library.dto.CheckoutRequest;
 import com.example.library.dto.CheckoutRequestDTO;
 import com.example.library.entity.*;
@@ -39,6 +40,7 @@ public class LoanService {
     @Autowired
     private NotificationService notificationService;
 
+    @AuditableOperation(action = "CHECKOUT", entityType = "Loan")
     public Loan checkout(CheckoutRequestDTO req) {
         if (req.getMemberId() == null && (req.getMembershipNumber() == null || req.getMembershipNumber().isBlank())) {
             throw new CheckoutValidationException("memberId or membershipNumber is required");
@@ -145,6 +147,7 @@ public class LoanService {
         return savedLoan;
     }
 
+    @AuditableOperation(action = "RENEW", entityType = "Loan")
     public Loan renewLoan(Long loanId) {
         return renew(loanId);
     }

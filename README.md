@@ -10,6 +10,16 @@ A library management system built with Spring Boot 3 (Java) and Angular 17 (Type
 - **Frontend:** Angular 17, standalone components, RxJS — 143 TypeScript files
 - **Tests:** Cucumber-JVM + RestAssured (11 feature files, 33 Java step/support files), Jasmine/Karma (frontend)
 
+## Custom annotations
+
+Three custom annotations in `com.example.library.annotation`, each representing a distinct Java annotation use case:
+
+| Annotation | Type | What it does |
+|---|---|---|
+| `@ValidIsbn` | Bean Validation constraint | Validates ISBN-10 and ISBN-13 check digits via `IsbnConstraintValidator`. Applied to `CreateBookRequest.isbn`. |
+| `@AuditableOperation` | AOP-backed marker | `AuditableOperationAspect` intercepts annotated methods and writes an `AuditLog` entry via `AuditService`. Applied to checkout, return, renew, pay fine, and waive fine. |
+| `@LibraryTransactional` | Meta-annotation | Composes `@Transactional` with library-wide defaults: `READ_COMMITTED` isolation, `REQUIRED` propagation, rollback on all exceptions. |
+
 ## Design patterns
 
 The backend implements nine GoF patterns across the `com.example.library.pattern` package, making it a useful corpus for code-navigation queries about pattern usage:

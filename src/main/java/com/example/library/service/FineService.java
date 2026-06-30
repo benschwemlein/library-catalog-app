@@ -1,5 +1,6 @@
 package com.example.library.service;
 
+import com.example.library.annotation.AuditableOperation;
 import com.example.library.dto.PayFineRequest;
 import com.example.library.dto.WaiveFineRequest;
 import com.example.library.entity.*;
@@ -53,6 +54,7 @@ public class FineService {
         return fineRepository.save(fine);
     }
 
+    @AuditableOperation(action = "PAY_FINE", entityType = "Fine")
     public Fine payFine(Long fineId, PayFineRequest req) {
         Fine fine = fineRepository.findById(fineId)
                 .orElseThrow(() -> new IllegalArgumentException("Fine not found with id: " + fineId));
@@ -66,6 +68,7 @@ public class FineService {
         return fineRepository.save(fine);
     }
 
+    @AuditableOperation(action = "WAIVE_FINE", entityType = "Fine")
     public Fine waiveFine(Long fineId, WaiveFineRequest req) {
         Fine fine = fineRepository.findById(fineId)
                 .orElseThrow(() -> new IllegalArgumentException("Fine not found with id: " + fineId));

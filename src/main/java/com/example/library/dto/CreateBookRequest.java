@@ -1,5 +1,6 @@
 package com.example.library.dto;
 
+import com.example.library.annotation.ValidIsbn;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,6 +16,7 @@ import java.util.List;
 public class CreateBookRequest {
 
     @NotBlank
+    @ValidIsbn
     private String isbn;
 
     @NotBlank
